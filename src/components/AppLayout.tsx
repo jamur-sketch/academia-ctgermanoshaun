@@ -1,0 +1,134 @@
+import { useLocation } from "react-router-dom";
+import {
+  Users,
+  CreditCard,
+  Dumbbell,
+  Settings,
+  DollarSign,
+  BarChart3,
+  Trophy,
+  Award,
+  Menu,
+} from "lucide-react";
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { NavLink } from "@/components/NavLink";
+import { Separator } from "@/components/ui/separator";
+
+const navItems = [
+  { title: "Alunos", url: "/alunos", icon: Users },
+  { title: "Planos", url: "/planos", icon: CreditCard },
+  { title: "Aulas", url: "/aulas", icon: Dumbbell },
+  { title: "Graduações", url: "/graduacoes", icon: Award },
+  { title: "Financeiro", url: "/financeiro", icon: DollarSign },
+  { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
+  { title: "Ranking", url: "/ranking", icon: Trophy },
+  { title: "Configurações", url: "/configuracoes", icon: Settings },
+];
+
+function AppSidebar() {
+  const location = useLocation();
+
+  return (
+    <Sidebar collapsible="icon" className="border-r-0">
+      <SidebarHeader className="px-5 py-5 border-b border-sidebar-border/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
+            <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+              <Dumbbell className="h-5 w-5 text-sidebar-foreground" />
+            </div>
+            <div>
+              <span className="text-base font-bold text-sidebar-foreground tracking-tight">
+                Academia
+              </span>
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/40 font-medium">
+                Gestão
+              </span>
+            </div>
+          </div>
+          <SidebarTrigger className="text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors" />
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="pt-3">
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1 px-2">
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.url}
+                  >
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-white/5 transition-all text-sm font-medium"
+                      activeClassName="!text-sidebar-foreground !bg-white/10 shadow-sm"
+                    >
+                      <item.icon className="h-[18px] w-[18px]" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <Separator className="mb-4 bg-sidebar-border/30" />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center text-sidebar-foreground font-semibold text-sm shrink-0">
+            A
+          </div>
+          <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
+            <span className="text-sm font-semibold text-sidebar-foreground truncate">
+              Academia
+            </span>
+            <span className="text-[11px] text-sidebar-foreground/40 truncate">
+              Painel de gestão
+            </span>
+          </div>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+function MobileMenuButton() {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <button
+      onClick={toggleSidebar}
+      className="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg"
+    >
+      <Menu className="h-5 w-5" />
+    </button>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <MobileMenuButton />
+        {children}
+      </div>
+    </SidebarProvider>
+  );
+}
