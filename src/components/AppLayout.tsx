@@ -46,12 +46,14 @@ function AppSidebar() {
       <SidebarHeader className="px-5 py-5 border-b border-sidebar-border/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
-            <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
-              <Dumbbell className="h-5 w-5 text-sidebar-foreground" />
-            </div>
-            <div>
-              <span className="text-base font-bold text-sidebar-foreground tracking-tight">
-                Academia
+            <img
+              src="/logo.jpg"
+              alt="CT Germano Schaun"
+              className="w-9 h-9 rounded-full object-cover shrink-0"
+            />
+            <div className="min-w-0">
+              <span className="text-sm font-bold text-sidebar-foreground tracking-tight leading-tight block truncate">
+                CT Germano Schaun
               </span>
               <span className="block text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/40 font-medium">
                 Gestão
@@ -92,12 +94,14 @@ function AppSidebar() {
       <SidebarFooter className="p-4">
         <Separator className="mb-4 bg-sidebar-border/30" />
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center text-sidebar-foreground font-semibold text-sm shrink-0">
-            A
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="CT Germano Schaun"
+            className="w-9 h-9 rounded-full object-cover shrink-0"
+          />
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground truncate">
-              Academia
+              Equipe Germano Schaun
             </span>
             <span className="text-[11px] text-sidebar-foreground/40 truncate">
               Painel de gestão
