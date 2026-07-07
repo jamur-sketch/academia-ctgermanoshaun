@@ -125,15 +125,20 @@ function AppSidebar() {
   );
 }
 
-function MobileMenuButton() {
+function MobileTopBar() {
   const { toggleSidebar } = useSidebar();
   return (
-    <button
-      onClick={toggleSidebar}
-      className="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg"
-    >
-      <Menu className="h-5 w-5" />
-    </button>
+    <div className="md:hidden sticky top-0 z-40 flex items-center gap-3 h-14 px-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <button
+        onClick={toggleSidebar}
+        aria-label="Abrir menu"
+        className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+      <img src="/logo.jpg" alt="CT Germano Schaun" className="w-7 h-7 rounded-full object-cover shrink-0" />
+      <span className="font-semibold text-sm truncate">CT Germano Schaun</span>
+    </div>
   );
 }
 
@@ -142,8 +147,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <MobileMenuButton />
-        {children}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <MobileTopBar />
+          {children}
+        </div>
       </div>
     </SidebarProvider>
   );
