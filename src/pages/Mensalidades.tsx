@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useStudents } from "@/hooks/useStudents";
 import { useClasses } from "@/hooks/useClasses";
+import { usePlans } from "@/hooks/usePlans";
 import {
   useMonthlyPayments,
   usePaymentConfigs,
@@ -49,6 +50,7 @@ function fmt(amount: number) {
 export default function Mensalidades() {
   const { students, updateStudent } = useStudents();
   const { classes } = useClasses();
+  const { plans } = usePlans();
   const { key: getPayment, markPaid, unmarkPaid } = useMonthlyPayments();
   const { getConfig, setConfig } = usePaymentConfigs();
 
@@ -78,8 +80,8 @@ export default function Mensalidades() {
     setYear(y);
   };
 
-  // modalidade do aluno (primeira turma que ele pertence)
-  const studentModality = useMemo(() => {
+  // modalidade do aluno: prioriza a turma (quando houver), senão usa o plano
+  const classModality = useMemo(() => {
     const map = new Map<string, string>();
     for (const c of classes) {
       for (const sid of c.studentIds) {
@@ -88,6 +90,15 @@ export default function Mensalidades() {
     }
     return map;
   }, [classes]);
+
+  const planName = useMemo(() => {
+    const map = new Map<string, string>();
+    plans.forEach((p) => map.set(p.id, p.name));
+    return map;
+  }, [plans]);
+
+  const modalityOf = (studentId: string, planId: string) =>
+    classModality.get(studentId) ?? planName.get(planId) ?? "—";
 
   const makeRows = (list: typeof students) =>
     list
@@ -249,7 +260,7 @@ export default function Mensalidades() {
                 <TableRow key={student.id}>
                   <TableCell className="font-medium whitespace-nowrap">{student.name}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {studentModality.get(student.id) ?? "—"}
+                    {modalityOf(student.id, student.planId)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     {paid && amountPaid !== null ? (
@@ -353,7 +364,7 @@ export default function Mensalidades() {
                   <TableRow key={student.id} className="opacity-60">
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {studentModality.get(student.id) ?? "—"}
+                      {modalityOf(student.id, student.planId)}
                     </TableCell>
                     <TableCell className="text-right">{fmt(config.monthlyFee)}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">{config.notes || "—"}</TableCell>
