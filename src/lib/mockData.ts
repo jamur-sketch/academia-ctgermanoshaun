@@ -46,6 +46,7 @@ export interface Student {
   planId: string;
   joinDate: string;
   lastActivityDate: string;
+  status: StudentStatus;
 }
 
 export interface ClassGroup {
@@ -118,6 +119,7 @@ export const seedStudents: Student[] = Array.from({ length: 36 }).map((_, i) => 
     planId: seedPlans[i % seedPlans.length].id,
     joinDate: randomDateWithinMonths(11),
     lastActivityDate: randomDateWithinMonths(2),
+    status: "ativo" as StudentStatus,
   };
 });
 

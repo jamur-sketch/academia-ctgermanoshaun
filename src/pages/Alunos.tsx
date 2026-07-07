@@ -53,6 +53,7 @@ const emptyForm: FormState = {
   planId: "",
   joinDate: new Date().toISOString().slice(0, 10),
   lastActivityDate: new Date().toISOString().slice(0, 10),
+  status: "ativo",
 };
 
 export default function Alunos() {

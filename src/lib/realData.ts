@@ -3,7 +3,6 @@
 import type { Student } from "./mockData";
 import type { PaymentConfig, MonthlyPayment } from "../hooks/useMonthlyPayments";
 
-// 92 students, 92 configs, 329 payments
 
 export const seedRealStudents: Student[] = [
   {
@@ -15,7 +14,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-2",
@@ -26,7 +26,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "ativo"
   },
   {
     "id": "real-3",
@@ -37,7 +38,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-4",
@@ -47,8 +49,9 @@ export const seedRealStudents: Student[] = [
     "birthDate": "1990-01-01",
     "gender": "masculino",
     "planId": "plan-1",
-    "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-04-15"
+    "joinDate": "2026-01-01",
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-5",
@@ -59,7 +62,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-04-15"
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-6",
@@ -70,7 +74,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-04-15"
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-7",
@@ -81,7 +86,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-8",
@@ -92,7 +98,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-9",
@@ -103,7 +110,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-04-15"
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-10",
@@ -113,8 +121,9 @@ export const seedRealStudents: Student[] = [
     "birthDate": "1990-01-01",
     "gender": "masculino",
     "planId": "plan-2",
-    "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-04-15"
+    "joinDate": "2025-11-01",
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-11",
@@ -124,8 +133,9 @@ export const seedRealStudents: Student[] = [
     "birthDate": "1990-01-01",
     "gender": "feminino",
     "planId": "plan-2",
-    "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-06-15"
+    "joinDate": "2025-11-01",
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-12",
@@ -136,7 +146,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-13",
@@ -147,7 +158,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-14",
@@ -157,8 +169,9 @@ export const seedRealStudents: Student[] = [
     "birthDate": "1990-01-01",
     "gender": "masculino",
     "planId": "plan-2",
-    "joinDate": "2026-03-01",
-    "lastActivityDate": "2026-03-15"
+    "joinDate": "2025-12-01",
+    "lastActivityDate": "2026-03-15",
+    "status": "inativo"
   },
   {
     "id": "real-15",
@@ -169,7 +182,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "inativo"
   },
   {
     "id": "real-16",
@@ -180,7 +194,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-17",
@@ -191,7 +206,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-02-15"
+    "lastActivityDate": "2026-02-15",
+    "status": "inativo"
   },
   {
     "id": "real-18",
@@ -202,7 +218,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-19",
@@ -213,7 +230,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-12-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-20",
@@ -224,7 +242,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-21",
@@ -235,7 +254,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-22",
@@ -246,7 +266,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-23",
@@ -257,7 +278,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-24",
@@ -268,7 +290,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-25",
@@ -279,7 +302,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-02-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-26",
@@ -290,7 +314,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-27",
@@ -301,7 +326,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-12-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-28",
@@ -312,7 +338,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-29",
@@ -322,8 +349,9 @@ export const seedRealStudents: Student[] = [
     "birthDate": "1990-01-01",
     "gender": "feminino",
     "planId": "plan-2",
-    "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-06-15"
+    "joinDate": "2025-11-01",
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-30",
@@ -334,7 +362,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-31",
@@ -345,7 +374,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-32",
@@ -356,7 +386,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-33",
@@ -367,7 +398,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-34",
@@ -378,7 +410,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-35",
@@ -389,7 +422,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-36",
@@ -400,7 +434,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "ativo"
   },
   {
     "id": "real-37",
@@ -411,7 +446,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-38",
@@ -422,7 +458,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-39",
@@ -433,7 +470,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-40",
@@ -444,7 +482,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-05-15"
+    "lastActivityDate": "2026-05-15",
+    "status": "ativo"
   },
   {
     "id": "real-41",
@@ -455,7 +494,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-42",
@@ -466,7 +506,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-43",
@@ -477,7 +518,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-44",
@@ -488,7 +530,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-02-15"
+    "lastActivityDate": "2026-02-15",
+    "status": "inativo"
   },
   {
     "id": "real-45",
@@ -499,7 +542,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-46",
@@ -510,7 +554,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-47",
@@ -521,7 +566,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2025-12-15"
+    "lastActivityDate": "2025-12-15",
+    "status": "inativo"
   },
   {
     "id": "real-48",
@@ -532,7 +578,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-02-15"
+    "lastActivityDate": "2026-02-15",
+    "status": "inativo"
   },
   {
     "id": "real-49",
@@ -543,7 +590,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "ativo"
   },
   {
     "id": "real-50",
@@ -554,7 +602,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-51",
@@ -565,7 +614,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "inativo"
   },
   {
     "id": "real-52",
@@ -576,7 +626,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "inativo"
   },
   {
     "id": "real-53",
@@ -587,7 +638,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2025-12-01",
-    "lastActivityDate": "2025-12-15"
+    "lastActivityDate": "2025-12-15",
+    "status": "inativo"
   },
   {
     "id": "real-54",
@@ -598,7 +650,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-55",
@@ -609,7 +662,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-12-01",
-    "lastActivityDate": "2026-05-15"
+    "lastActivityDate": "2026-05-15",
+    "status": "ativo"
   },
   {
     "id": "real-56",
@@ -620,7 +674,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-57",
@@ -631,7 +686,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2025-11-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-58",
@@ -642,7 +698,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-59",
@@ -653,7 +710,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-60",
@@ -664,7 +722,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-61",
@@ -675,7 +734,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-62",
@@ -686,7 +746,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-03-15"
+    "lastActivityDate": "2026-03-15",
+    "status": "inativo"
   },
   {
     "id": "real-63",
@@ -697,7 +758,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-01-15"
+    "lastActivityDate": "2026-01-15",
+    "status": "inativo"
   },
   {
     "id": "real-64",
@@ -708,7 +770,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-65",
@@ -719,7 +782,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-01-01",
-    "lastActivityDate": "2026-05-15"
+    "lastActivityDate": "2026-05-15",
+    "status": "inativo"
   },
   {
     "id": "real-66",
@@ -730,7 +794,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-02-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-67",
@@ -741,7 +806,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-02-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-68",
@@ -752,7 +818,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-03-01",
-    "lastActivityDate": "2025-11-15"
+    "lastActivityDate": "2025-11-15",
+    "status": "inativo"
   },
   {
     "id": "real-69",
@@ -763,7 +830,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-03-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-70",
@@ -774,7 +842,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-03-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-71",
@@ -785,7 +854,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-03-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-72",
@@ -796,7 +866,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-04-15"
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-73",
@@ -807,7 +878,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-04-15"
+    "lastActivityDate": "2026-04-15",
+    "status": "ativo"
   },
   {
     "id": "real-74",
@@ -818,7 +890,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-75",
@@ -829,7 +902,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-76",
@@ -840,7 +914,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-77",
@@ -851,7 +926,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-78",
@@ -862,7 +938,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-79",
@@ -873,7 +950,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-80",
@@ -884,7 +962,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-81",
@@ -895,7 +974,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-82",
@@ -906,7 +986,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-83",
@@ -917,7 +998,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-84",
@@ -928,7 +1010,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-85",
@@ -939,7 +1022,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-86",
@@ -950,7 +1034,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-87",
@@ -961,7 +1046,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-88",
@@ -972,7 +1058,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-89",
@@ -983,7 +1070,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-90",
@@ -994,7 +1082,8 @@ export const seedRealStudents: Student[] = [
     "gender": "masculino",
     "planId": "plan-1",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-91",
@@ -1005,7 +1094,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-06-15"
+    "lastActivityDate": "2026-06-15",
+    "status": "ativo"
   },
   {
     "id": "real-92",
@@ -1016,7 +1106,8 @@ export const seedRealStudents: Student[] = [
     "gender": "feminino",
     "planId": "plan-2",
     "joinDate": "2026-04-01",
-    "lastActivityDate": "2026-05-15"
+    "lastActivityDate": "2026-05-15",
+    "status": "ativo"
   }
 ];
 

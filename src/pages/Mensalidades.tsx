@@ -47,7 +47,7 @@ function fmt(amount: number) {
 }
 
 export default function Mensalidades() {
-  const { students } = useStudents();
+  const { students, updateStudent } = useStudents();
   const { classes } = useClasses();
   const { key: getPayment, markPaid, unmarkPaid } = useMonthlyPayments();
   const { getConfig, setConfig } = usePaymentConfigs();
@@ -89,21 +89,30 @@ export default function Mensalidades() {
     return map;
   }, [classes]);
 
-  const rows = useMemo(() => {
-    return students
-      .filter((s) =>
-        s.name.toLowerCase().includes(search.toLowerCase())
-      )
+  const makeRows = (list: typeof students) =>
+    list
+      .filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
       .map((s) => {
         const config = getConfig(s.id);
         const payment = getPayment(s.id, month, year);
         const currentFee = effectiveFee(config.monthlyFee);
         return { student: s, config, payment, currentFee };
       });
-  }, [students, search, month, year, getConfig, getPayment]);
 
-  // KPIs
-  const totalAlunos = rows.length;
+  const ativos = useMemo(
+    () => makeRows(students.filter((s) => s.status === "ativo")),
+    [students, search, month, year, getConfig, getPayment]
+  );
+  const inativos = useMemo(
+    () => makeRows(students.filter((s) => s.status === "inativo")),
+    [students, search, month, year, getConfig, getPayment]
+  );
+  const rows = ativos;
+
+  const [showInativos, setShowInativos] = useState(false);
+
+  // KPIs — baseado apenas nos ativos
+  const totalAlunos = ativos.length;
   const pagos = rows.filter((r) => r.payment?.paid).length;
   const pendentes = totalAlunos - pagos;
   const valorRecebido = rows.reduce(
@@ -316,6 +325,54 @@ export default function Mensalidades() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Seção de inativos */}
+      <div className="border rounded-xl overflow-hidden">
+        <button
+          className="w-full flex items-center justify-between px-5 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium text-muted-foreground"
+          onClick={() => setShowInativos((v) => !v)}
+        >
+          <span>Alunos inativos (PAROU) — {inativos.length}</span>
+          <span className="text-xs">{showInativos ? "▲ Ocultar" : "▼ Mostrar"}</span>
+        </button>
+        {showInativos && (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Aluno</TableHead>
+                  <TableHead>Modalidade</TableHead>
+                  <TableHead className="text-right">Valor</TableHead>
+                  <TableHead>Observações</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {inativos.map(({ student, config }) => (
+                  <TableRow key={student.id} className="opacity-60">
+                    <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {studentModality.get(student.id) ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-right">{fmt(config.monthlyFee)}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{config.notes || "—"}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => updateStudent(student.id, { status: "ativo" })}
+                      >
+                        Reativar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {/* Dialog: Marcar como pago */}
