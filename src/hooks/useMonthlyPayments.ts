@@ -1,5 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { uid } from "@/lib/mockData";
+import { seedPaymentConfigs, seedMonthlyPayments } from "@/lib/realData";
 
 export interface PaymentConfig {
   monthlyFee: number;
@@ -35,8 +36,8 @@ export function effectiveFee(baseFee: number, date?: Date): number {
 
 export function usePaymentConfigs() {
   const [configs, setConfigs] = useLocalStorage<Record<string, PaymentConfig>>(
-    "academia:payment-configs",
-    {}
+    "academia:payment-configs:v2",
+    seedPaymentConfigs
   );
 
   const getConfig = (studentId: string): PaymentConfig =>
@@ -54,8 +55,8 @@ export function usePaymentConfigs() {
 
 export function useMonthlyPayments() {
   const [payments, setPayments] = useLocalStorage<MonthlyPayment[]>(
-    "academia:monthly-payments",
-    []
+    "academia:monthly-payments:v2",
+    seedMonthlyPayments
   );
 
   const key = (studentId: string, month: number, year: number) =>

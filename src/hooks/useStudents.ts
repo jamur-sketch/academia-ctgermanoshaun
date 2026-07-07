@@ -1,8 +1,9 @@
 import { useLocalStorage } from "./useLocalStorage";
-import { Student, seedStudents, uid } from "@/lib/mockData";
+import { Student, uid } from "@/lib/mockData";
+import { seedRealStudents } from "@/lib/realData";
 
 export function useStudents() {
-  const [students, setStudents] = useLocalStorage<Student[]>("academia:students", seedStudents);
+  const [students, setStudents] = useLocalStorage<Student[]>("academia:students:v2", seedRealStudents);
 
   const addStudent = (data: Omit<Student, "id">) => {
     setStudents((prev) => [...prev, { ...data, id: uid() }]);
