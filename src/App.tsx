@@ -8,6 +8,7 @@ import Relatorios from "@/pages/Relatorios";
 import Ranking from "@/pages/Ranking";
 import Graduacoes from "@/pages/Graduacoes";
 import Configuracoes from "@/pages/Configuracoes";
+import Mensalidades from "@/pages/Mensalidades";
 import NotFound from "@/pages/NotFound";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/alunos" element={<Alunos />} />
             <Route path="/planos" element={<Planos />} />
             <Route path="/aulas" element={<Aulas />} />
+            <Route path="/mensalidades" element={<Mensalidades />} />
             <Route path="/financeiro" element={<Financeiro />} />
             <Route path="/relatorios" element={<Relatorios />} />
             <Route path="/ranking" element={<Ranking />} />

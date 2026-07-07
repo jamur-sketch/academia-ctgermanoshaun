@@ -9,6 +9,7 @@ import {
   Trophy,
   Award,
   Menu,
+  CalendarCheck,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -32,6 +33,7 @@ const navItems = [
   { title: "Planos", url: "/planos", icon: CreditCard },
   { title: "Aulas", url: "/aulas", icon: Dumbbell },
   { title: "Graduações", url: "/graduacoes", icon: Award },
+  { title: "Mensalidades", url: "/mensalidades", icon: CalendarCheck },
   { title: "Financeiro", url: "/financeiro", icon: DollarSign },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
   { title: "Ranking", url: "/ranking", icon: Trophy },
