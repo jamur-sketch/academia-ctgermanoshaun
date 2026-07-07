@@ -1,20 +1,40 @@
-import { useLocalStorage } from "./useLocalStorage";
-import { FinancialEntry, seedFinancialEntries, uid } from "@/lib/mockData";
+import { FinancialEntry, uid } from "@/lib/mockData";
+import { useSupabaseTable, dateOrNull } from "./useSupabaseTable";
+
+function fromRow(r: Record<string, unknown>): FinancialEntry {
+  return {
+    id: r.id as string,
+    type: (r.type as FinancialEntry["type"]) ?? "receita",
+    category: (r.category as string) ?? "",
+    paymentMethod: (r.payment_method as string) ?? "",
+    amount: Number(r.amount ?? 0),
+    date: (r.date as string) ?? "",
+    description: (r.description as string) ?? "",
+  };
+}
+
+function toRow(e: Partial<FinancialEntry>): Record<string, unknown> {
+  const r: Record<string, unknown> = {};
+  if (e.id !== undefined) r.id = e.id;
+  if (e.type !== undefined) r.type = e.type;
+  if (e.category !== undefined) r.category = e.category;
+  if (e.paymentMethod !== undefined) r.payment_method = e.paymentMethod;
+  if (e.amount !== undefined) r.amount = e.amount;
+  if (e.date !== undefined) r.date = dateOrNull(e.date);
+  if (e.description !== undefined) r.description = e.description;
+  return r;
+}
 
 export function useFinancialEntries() {
-  const [entries, setEntries] = useLocalStorage<FinancialEntry[]>("academia:financial", seedFinancialEntries);
+  const { items, loading, add, update, remove } = useSupabaseTable<FinancialEntry>(
+    "financial_entries",
+    fromRow,
+    toRow
+  );
 
-  const addEntry = (data: Omit<FinancialEntry, "id">) => {
-    setEntries((prev) => [...prev, { ...data, id: uid() }]);
-  };
+  const addEntry = (data: Omit<FinancialEntry, "id">) => add({ ...data, id: uid() });
+  const updateEntry = (id: string, data: Partial<FinancialEntry>) => update(id, data);
+  const deleteEntry = (id: string) => remove(id);
 
-  const updateEntry = (id: string, data: Partial<FinancialEntry>) => {
-    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
-  };
-
-  const deleteEntry = (id: string) => {
-    setEntries((prev) => prev.filter((e) => e.id !== id));
-  };
-
-  return { entries, addEntry, updateEntry, deleteEntry };
+  return { entries: items, loading, addEntry, updateEntry, deleteEntry };
 }

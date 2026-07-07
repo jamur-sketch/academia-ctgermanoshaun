@@ -1,20 +1,32 @@
-import { useLocalStorage } from "./useLocalStorage";
-import { Plan, seedPlans, uid } from "@/lib/mockData";
+import { Plan, uid } from "@/lib/mockData";
+import { useSupabaseTable } from "./useSupabaseTable";
+
+function fromRow(r: Record<string, unknown>): Plan {
+  return {
+    id: r.id as string,
+    name: (r.name as string) ?? "",
+    price: Number(r.price ?? 0),
+    classesPerMonth: Number(r.classes_per_month ?? 0),
+    highlight: Boolean(r.highlight),
+  };
+}
+
+function toRow(p: Partial<Plan>): Record<string, unknown> {
+  const r: Record<string, unknown> = {};
+  if (p.id !== undefined) r.id = p.id;
+  if (p.name !== undefined) r.name = p.name;
+  if (p.price !== undefined) r.price = p.price;
+  if (p.classesPerMonth !== undefined) r.classes_per_month = p.classesPerMonth;
+  if (p.highlight !== undefined) r.highlight = p.highlight;
+  return r;
+}
 
 export function usePlans() {
-  const [plans, setPlans] = useLocalStorage<Plan[]>("academia:plans", seedPlans);
+  const { items, loading, add, update, remove } = useSupabaseTable<Plan>("plans", fromRow, toRow);
 
-  const addPlan = (data: Omit<Plan, "id">) => {
-    setPlans((prev) => [...prev, { ...data, id: uid() }]);
-  };
+  const addPlan = (data: Omit<Plan, "id">) => add({ ...data, id: uid() });
+  const updatePlan = (id: string, data: Partial<Plan>) => update(id, data);
+  const deletePlan = (id: string) => remove(id);
 
-  const updatePlan = (id: string, data: Partial<Plan>) => {
-    setPlans((prev) => prev.map((p) => (p.id === id ? { ...p, ...data } : p)));
-  };
-
-  const deletePlan = (id: string) => {
-    setPlans((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  return { plans, addPlan, updatePlan, deletePlan };
+  return { plans: items, loading, addPlan, updatePlan, deletePlan };
 }

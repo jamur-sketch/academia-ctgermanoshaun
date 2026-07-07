@@ -10,6 +10,7 @@ import {
   Award,
   Menu,
   CalendarCheck,
+  LogOut,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { title: "Alunos", url: "/alunos", icon: Users },
@@ -42,6 +44,7 @@ const navItems = [
 
 function AppSidebar() {
   const location = useLocation();
+  const { session, signOut } = useAuth();
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -101,14 +104,21 @@ function AppSidebar() {
             alt="CT Germano Schaun"
             className="w-9 h-9 rounded-full object-cover shrink-0"
           />
-          <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
+          <div className="flex flex-col min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground truncate">
               Equipe Germano Schaun
             </span>
             <span className="text-[11px] text-sidebar-foreground/40 truncate">
-              Painel de gestão
+              {session?.user?.email ?? "Painel de gestão"}
             </span>
           </div>
+          <button
+            onClick={signOut}
+            title="Sair"
+            className="text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors shrink-0 group-data-[collapsible=icon]:hidden"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </SidebarFooter>
     </Sidebar>

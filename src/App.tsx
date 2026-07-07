@@ -10,8 +10,19 @@ import Graduacoes from "@/pages/Graduacoes";
 import Configuracoes from "@/pages/Configuracoes";
 import Mensalidades from "@/pages/Mensalidades";
 import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
-export default function App() {
+function Splash() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+      <img src="/logo.jpg" alt="CT Germano Schaun" className="w-16 h-16 rounded-full object-cover animate-pulse" />
+      <p className="text-sm text-muted-foreground">Carregando...</p>
+    </div>
+  );
+}
+
+function AppRoutes() {
   return (
     <BrowserRouter>
       <AppLayout>
@@ -32,5 +43,20 @@ export default function App() {
         </main>
       </AppLayout>
     </BrowserRouter>
+  );
+}
+
+function Gate() {
+  const { session, loading } = useAuth();
+  if (loading) return <Splash />;
+  if (!session) return <Login />;
+  return <AppRoutes />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
   );
 }

@@ -1,21 +1,46 @@
-import { useLocalStorage } from "./useLocalStorage";
 import { Student, uid } from "@/lib/mockData";
-import { seedRealStudents } from "@/lib/realData";
+import { useSupabaseTable, dateOrNull } from "./useSupabaseTable";
+
+function fromRow(r: Record<string, unknown>): Student {
+  return {
+    id: r.id as string,
+    name: (r.name as string) ?? "",
+    phone: (r.phone as string) ?? "",
+    email: (r.email as string) ?? "",
+    birthDate: (r.birth_date as string) ?? "",
+    gender: (r.gender as Student["gender"]) ?? "masculino",
+    planId: (r.plan_id as string) ?? "",
+    joinDate: (r.join_date as string) ?? "",
+    lastActivityDate: (r.last_activity_date as string) ?? "",
+    status: (r.status as Student["status"]) ?? "ativo",
+  };
+}
+
+function toRow(s: Partial<Student>): Record<string, unknown> {
+  const r: Record<string, unknown> = {};
+  if (s.id !== undefined) r.id = s.id;
+  if (s.name !== undefined) r.name = s.name;
+  if (s.phone !== undefined) r.phone = s.phone;
+  if (s.email !== undefined) r.email = s.email;
+  if (s.birthDate !== undefined) r.birth_date = dateOrNull(s.birthDate);
+  if (s.gender !== undefined) r.gender = s.gender;
+  if (s.planId !== undefined) r.plan_id = s.planId || null;
+  if (s.joinDate !== undefined) r.join_date = dateOrNull(s.joinDate);
+  if (s.lastActivityDate !== undefined) r.last_activity_date = dateOrNull(s.lastActivityDate);
+  if (s.status !== undefined) r.status = s.status;
+  return r;
+}
 
 export function useStudents() {
-  const [students, setStudents] = useLocalStorage<Student[]>("academia:students:v2", seedRealStudents);
+  const { items, loading, add, update, remove } = useSupabaseTable<Student>(
+    "students",
+    fromRow,
+    toRow
+  );
 
-  const addStudent = (data: Omit<Student, "id">) => {
-    setStudents((prev) => [...prev, { ...data, id: uid() }]);
-  };
+  const addStudent = (data: Omit<Student, "id">) => add({ ...data, id: uid() });
+  const updateStudent = (id: string, data: Partial<Student>) => update(id, data);
+  const deleteStudent = (id: string) => remove(id);
 
-  const updateStudent = (id: string, data: Partial<Student>) => {
-    setStudents((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
-  };
-
-  const deleteStudent = (id: string) => {
-    setStudents((prev) => prev.filter((s) => s.id !== id));
-  };
-
-  return { students, addStudent, updateStudent, deleteStudent };
+  return { students: items, loading, addStudent, updateStudent, deleteStudent };
 }
