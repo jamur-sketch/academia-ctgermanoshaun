@@ -11,6 +11,7 @@ import Configuracoes from "@/pages/Configuracoes";
 import Mensalidades from "@/pages/Mensalidades";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
+import ChangePassword from "@/pages/ChangePassword";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 function Splash() {
@@ -50,6 +51,7 @@ function Gate() {
   const { session, loading } = useAuth();
   if (loading) return <Splash />;
   if (!session) return <Login />;
+  if (session.user.user_metadata?.must_change_password) return <ChangePassword />;
   return <AppRoutes />;
 }
 
