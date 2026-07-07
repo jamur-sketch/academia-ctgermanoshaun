@@ -13,6 +13,7 @@ function fromRow(r: Record<string, unknown>): Student {
     joinDate: (r.join_date as string) ?? "",
     lastActivityDate: (r.last_activity_date as string) ?? "",
     status: (r.status as Student["status"]) ?? "ativo",
+    referredBy: (r.referred_by as string) ?? "",
   };
 }
 
@@ -28,6 +29,7 @@ function toRow(s: Partial<Student>): Record<string, unknown> {
   if (s.joinDate !== undefined) r.join_date = dateOrNull(s.joinDate);
   if (s.lastActivityDate !== undefined) r.last_activity_date = dateOrNull(s.lastActivityDate);
   if (s.status !== undefined) r.status = s.status;
+  if (s.referredBy !== undefined) r.referred_by = s.referredBy || null;
   return r;
 }
 

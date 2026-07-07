@@ -226,6 +226,27 @@ export default function Alunos() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Indicado por (opcional)</Label>
+              <Select
+                value={form.referredBy || "none"}
+                onValueChange={(v) => setForm({ ...form, referredBy: v === "none" ? "" : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Ninguém" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Ninguém</SelectItem>
+                  {students
+                    .filter((s) => s.id !== editingId)
+                    .map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>

@@ -47,6 +47,7 @@ export interface Student {
   joinDate: string;
   lastActivityDate: string;
   status: StudentStatus;
+  referredBy?: string;
 }
 
 export interface ClassGroup {

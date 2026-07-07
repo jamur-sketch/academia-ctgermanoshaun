@@ -10,6 +10,7 @@ import {
   Award,
   Menu,
   CalendarCheck,
+  ClipboardCheck,
   LogOut,
 } from "lucide-react";
 import {
@@ -34,6 +35,7 @@ const navItems = [
   { title: "Alunos", url: "/alunos", icon: Users },
   { title: "Planos", url: "/planos", icon: CreditCard },
   { title: "Aulas", url: "/aulas", icon: Dumbbell },
+  { title: "Chamada", url: "/chamada", icon: ClipboardCheck },
   { title: "Graduações", url: "/graduacoes", icon: Award },
   { title: "Mensalidades", url: "/mensalidades", icon: CalendarCheck },
   { title: "Financeiro", url: "/financeiro", icon: DollarSign },
