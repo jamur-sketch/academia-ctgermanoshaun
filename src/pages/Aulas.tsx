@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, Pencil, Trash2, Users, Check, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useClasses } from "@/hooks/useClasses";
+import { useStudents } from "@/hooks/useStudents";
 import { ClassGroup, ClassType, MODALITIES, Modality } from "@/lib/mockData";
 
 const TYPE_LABEL: Record<ClassType, string> = {
@@ -36,18 +37,40 @@ const emptyForm = (type: ClassType): FormState => ({
   modality: MODALITIES[0],
   instructorId: "",
   schedule: "",
-  capacity: 10,
+  capacity: 30,
 });
 
 function ClassList({ type }: { type: ClassType }) {
-  const { classes, instructors, addClass, updateClass, deleteClass } = useClasses();
+  const {
+    classes,
+    instructors,
+    addClass,
+    updateClass,
+    deleteClass,
+    enrollStudent,
+    unenrollStudent,
+  } = useClasses();
+  const { students } = useStudents();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm(type));
   const [deleteTarget, setDeleteTarget] = useState<ClassGroup | null>(null);
+  const [manageId, setManageId] = useState<string | null>(null);
+  const [studentSearch, setStudentSearch] = useState("");
 
   const items = classes.filter((c) => c.type === type);
   const instructorName = (id: string) => instructors.find((i) => i.id === id)?.name ?? "—";
+
+  const manageClass = manageId ? classes.find((c) => c.id === manageId) ?? null : null;
+
+  const filteredStudents = useMemo(
+    () =>
+      students
+        .filter((s) => s.status === "ativo")
+        .filter((s) => s.name.toLowerCase().includes(studentSearch.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [students, studentSearch]
+  );
 
   const openNew = () => {
     setEditingId(null);
@@ -58,6 +81,8 @@ function ClassList({ type }: { type: ClassType }) {
   const openEdit = (item: ClassGroup) => {
     setEditingId(item.id);
     const { id, studentIds, ...rest } = item;
+    void id;
+    void studentIds;
     setForm(rest);
     setDialogOpen(true);
   };
@@ -70,6 +95,11 @@ function ClassList({ type }: { type: ClassType }) {
       addClass({ ...form, studentIds: [] });
     }
     setDialogOpen(false);
+  };
+
+  const openManage = (item: ClassGroup) => {
+    setManageId(item.id);
+    setStudentSearch("");
   };
 
   return (
@@ -92,12 +122,18 @@ function ClassList({ type }: { type: ClassType }) {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">{item.schedule}</p>
-              <Badge variant="outline" className="gap-1">
-                <Users className="h-3 w-3" /> {item.studentIds.length}/{item.capacity}
-              </Badge>
+              <button
+                onClick={() => openManage(item)}
+                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-muted transition-colors"
+              >
+                <Users className="h-3 w-3" /> {item.studentIds.length}/{item.capacity} alunos
+              </button>
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openEdit(item)}>
-                  <Pencil className="h-3.5 w-3.5" /> Editar
+                <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openManage(item)}>
+                  <Users className="h-3.5 w-3.5" /> Alunos
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1" onClick={() => openEdit(item)}>
+                  <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   variant="outline"
@@ -118,6 +154,7 @@ function ClassList({ type }: { type: ClassType }) {
         )}
       </div>
 
+      {/* Dialog: criar/editar turma */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -187,6 +224,65 @@ function ClassList({ type }: { type: ClassType }) {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog: gerenciar alunos da turma */}
+      <Dialog open={!!manageClass} onOpenChange={(o) => !o && setManageId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Alunos — {manageClass?.name}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground -mt-2">
+            {manageClass?.studentIds.length ?? 0} de {manageClass?.capacity} matriculados. Toque para
+            adicionar ou remover.
+          </p>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={studentSearch}
+              onChange={(e) => setStudentSearch(e.target.value)}
+              placeholder="Buscar aluno..."
+              className="pl-9"
+            />
+          </div>
+          <div className="max-h-80 overflow-y-auto space-y-1 pr-1">
+            {filteredStudents.map((s) => {
+              const enrolled = manageClass?.studentIds.includes(s.id) ?? false;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() =>
+                    manageClass &&
+                    (enrolled
+                      ? unenrollStudent(manageClass.id, s.id)
+                      : enrollStudent(manageClass.id, s.id))
+                  }
+                  className={`w-full flex items-center justify-between gap-3 rounded-lg border p-2.5 text-left text-sm transition-colors ${
+                    enrolled ? "border-primary/40 bg-primary/5" : "hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="truncate">{s.name}</span>
+                  <span
+                    className={`h-5 w-5 rounded-full flex items-center justify-center shrink-0 border-2 ${
+                      enrolled
+                        ? "bg-primary border-primary text-primary-foreground"
+                        : "border-muted-foreground/30 text-transparent"
+                    }`}
+                  >
+                    <Check className="h-3 w-3" />
+                  </span>
+                </button>
+              );
+            })}
+            {filteredStudents.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Nenhum aluno encontrado.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setManageId(null)}>Concluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: excluir */}
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -220,23 +316,19 @@ export default function Aulas() {
     <div className="p-6 md:p-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Aulas</h1>
-        <p className="text-sm text-muted-foreground">Turmas, aulas particulares e aulas experimentais</p>
+        <p className="text-sm text-muted-foreground">Turmas por modalidade e aulas particulares</p>
       </div>
 
       <Tabs defaultValue="turma">
         <TabsList>
-          <TabsTrigger value="turma">Turma</TabsTrigger>
+          <TabsTrigger value="turma">Turmas</TabsTrigger>
           <TabsTrigger value="personal">Personal</TabsTrigger>
-          <TabsTrigger value="gratis">Aulas Grátis</TabsTrigger>
         </TabsList>
         <TabsContent value="turma">
           <ClassList type="turma" />
         </TabsContent>
         <TabsContent value="personal">
           <ClassList type="personal" />
-        </TabsContent>
-        <TabsContent value="gratis">
-          <ClassList type="gratis" />
         </TabsContent>
       </Tabs>
     </div>

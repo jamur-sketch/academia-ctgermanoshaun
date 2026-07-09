@@ -98,5 +98,50 @@ export function useClasses() {
     }
   };
 
-  return { classes, instructors, loading, addClass, updateClass, deleteClass };
+  const enrollStudent = async (classId: string, studentId: string) => {
+    setClasses((prev) =>
+      prev.map((c) =>
+        c.id === classId && !c.studentIds.includes(studentId)
+          ? { ...c, studentIds: [...c.studentIds, studentId] }
+          : c
+      )
+    );
+    const { error } = await supabase
+      .from("class_students")
+      .insert({ class_id: classId, student_id: studentId });
+    if (error) {
+      console.error("[class_students] insert:", error.message);
+      load();
+    }
+  };
+
+  const unenrollStudent = async (classId: string, studentId: string) => {
+    setClasses((prev) =>
+      prev.map((c) =>
+        c.id === classId
+          ? { ...c, studentIds: c.studentIds.filter((s) => s !== studentId) }
+          : c
+      )
+    );
+    const { error } = await supabase
+      .from("class_students")
+      .delete()
+      .eq("class_id", classId)
+      .eq("student_id", studentId);
+    if (error) {
+      console.error("[class_students] delete:", error.message);
+      load();
+    }
+  };
+
+  return {
+    classes,
+    instructors,
+    loading,
+    addClass,
+    updateClass,
+    deleteClass,
+    enrollStudent,
+    unenrollStudent,
+  };
 }
