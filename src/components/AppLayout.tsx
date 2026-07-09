@@ -35,12 +35,10 @@ const navItems = [
   { title: "Alunos", url: "/alunos", icon: Users },
   { title: "Planos", url: "/planos", icon: CreditCard },
   { title: "Aulas", url: "/aulas", icon: Dumbbell },
-  { title: "Chamada", url: "/chamada", icon: ClipboardCheck },
   { title: "Graduações", url: "/graduacoes", icon: Award },
   { title: "Mensalidades", url: "/mensalidades", icon: CalendarCheck },
   { title: "Financeiro", url: "/financeiro", icon: DollarSign },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
-  { title: "Ranking", url: "/ranking", icon: Trophy },
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ];
 
