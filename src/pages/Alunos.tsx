@@ -170,7 +170,9 @@ export default function Alunos() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Alunos</h1>
-          <p className="text-sm text-muted-foreground">{students.length} alunos cadastrados</p>
+          <p className="text-sm text-muted-foreground">
+            {students.filter((s) => s.status === "ativo").length} alunos ativos
+          </p>
         </div>
         <Button onClick={openNew} className="gap-2">
           <Plus className="h-4 w-4" /> Novo aluno
@@ -190,7 +192,7 @@ export default function Alunos() {
       <Tabs defaultValue="ativos">
         <TabsList>
           <TabsTrigger value="ativos">Ativos ({ativos.length})</TabsTrigger>
-          <TabsTrigger value="inativos">Inativos ({inativos.length})</TabsTrigger>
+          <TabsTrigger value="inativos">Inativos</TabsTrigger>
         </TabsList>
         <TabsContent value="ativos" className="mt-4">
           <StudentTable

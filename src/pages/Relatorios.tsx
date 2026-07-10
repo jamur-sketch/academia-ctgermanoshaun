@@ -43,10 +43,16 @@ const revenueChartConfig: ChartConfig = {
 };
 
 export default function Relatorios() {
-  const { students } = useStudents();
+  const { students: allStudents } = useStudents();
   const { plans } = usePlans();
   const { classes } = useClasses();
   const { entries } = useFinancialEntries();
+
+  // Todas as contagens de alunos consideram apenas os ativos.
+  const students = useMemo(
+    () => allStudents.filter((s) => s.status === "ativo"),
+    [allStudents]
+  );
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());

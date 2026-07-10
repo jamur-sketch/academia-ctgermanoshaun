@@ -27,7 +27,8 @@ export default function Planos() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<Plan | null>(null);
 
-  const studentsOf = (planId: string) => students.filter((s) => s.planIds.includes(planId));
+  const studentsOf = (planId: string) =>
+    students.filter((s) => s.planIds.includes(planId) && s.status === "ativo");
 
   const openNew = () => {
     setEditingId(null);
