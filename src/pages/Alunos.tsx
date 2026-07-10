@@ -29,7 +29,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useStudents } from "@/hooks/useStudents";
 import { usePlans } from "@/hooks/usePlans";
-import { Gender, Student, StudentStatus } from "@/lib/mockData";
+import { Gender, Student, StudentStatus, MOTIVOS_INATIVACAO } from "@/lib/mockData";
 
 const GENDER_LABEL: Record<Gender, string> = {
   masculino: "Masculino",
@@ -42,11 +42,13 @@ function StudentTable({
   planName,
   onEdit,
   onDelete,
+  showReason = false,
 }: {
   rows: Student[];
   planName: (ids: string[]) => string;
   onEdit: (s: Student) => void;
   onDelete: (s: Student) => void;
+  showReason?: boolean;
 }) {
   return (
     <div className="rounded-xl border bg-card overflow-x-auto">
@@ -55,7 +57,7 @@ function StudentTable({
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Contato</TableHead>
-            <TableHead>Plano</TableHead>
+            {showReason ? <TableHead>Motivo</TableHead> : <TableHead>Plano</TableHead>}
             <TableHead>Gênero</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -69,7 +71,13 @@ function StudentTable({
                 {s.phone && s.email && <br />}
                 {s.email}
               </TableCell>
-              <TableCell>{planName(s.planIds)}</TableCell>
+              {showReason ? (
+                <TableCell className="text-sm text-muted-foreground">
+                  {s.inactiveReason || "—"}
+                </TableCell>
+              ) : (
+                <TableCell>{planName(s.planIds)}</TableCell>
+              )}
               <TableCell>{GENDER_LABEL[s.gender]}</TableCell>
               <TableCell className="text-right space-x-1">
                 <Button variant="ghost" size="icon" onClick={() => onEdit(s)}>
@@ -106,6 +114,7 @@ const emptyForm: FormState = {
   joinDate: new Date().toISOString().slice(0, 10),
   lastActivityDate: new Date().toISOString().slice(0, 10),
   status: "ativo",
+  inactiveReason: "",
 };
 
 export default function Alunos() {
@@ -115,7 +124,15 @@ export default function Alunos() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [formError, setFormError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
+
+  const setStatus = (status: StudentStatus) =>
+    setForm((prev) => ({
+      ...prev,
+      status,
+      inactiveReason: status === "ativo" ? "" : prev.inactiveReason,
+    }));
 
   const planName = (ids: string[]) => {
     const names = ids.map((id) => plans.find((p) => p.id === id)?.name).filter(Boolean);
@@ -144,23 +161,33 @@ export default function Alunos() {
 
   const openNew = () => {
     setEditingId(null);
+    setFormError("");
     setForm({ ...emptyForm, planIds: [] });
     setDialogOpen(true);
   };
 
   const openEdit = (student: Student) => {
     setEditingId(student.id);
+    setFormError("");
     const { id, ...rest } = student;
-    setForm(rest);
+    setForm({ ...emptyForm, ...rest });
     setDialogOpen(true);
   };
 
   const handleSave = () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim()) {
+      setFormError("Informe o nome do aluno.");
+      return;
+    }
+    if (form.status === "inativo" && !form.inactiveReason) {
+      setFormError("Selecione o motivo da inatividade.");
+      return;
+    }
+    const data = { ...form, inactiveReason: form.status === "ativo" ? "" : form.inactiveReason };
     if (editingId) {
-      updateStudent(editingId, form);
+      updateStudent(editingId, data);
     } else {
-      addStudent(form);
+      addStudent(data);
     }
     setDialogOpen(false);
   };
@@ -208,6 +235,7 @@ export default function Alunos() {
             planName={planName}
             onEdit={openEdit}
             onDelete={setDeleteTarget}
+            showReason
           />
         </TabsContent>
       </Tabs>
@@ -278,12 +306,9 @@ export default function Alunos() {
                 Pode marcar mais de um (ex: Muay Thai + Personal).
               </p>
             </div>
-            <div className="col-span-2 space-y-1.5">
+            <div className="space-y-1.5">
               <Label>Situação</Label>
-              <Select
-                value={form.status}
-                onValueChange={(v: StudentStatus) => setForm({ ...form, status: v })}
-              >
+              <Select value={form.status} onValueChange={(v: StudentStatus) => setStatus(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -293,6 +318,26 @@ export default function Alunos() {
                 </SelectContent>
               </Select>
             </div>
+            {form.status === "inativo" && (
+              <div className="space-y-1.5">
+                <Label>Motivo da inatividade</Label>
+                <Select
+                  value={form.inactiveReason || ""}
+                  onValueChange={(v) => setForm({ ...form, inactiveReason: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o motivo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MOTIVOS_INATIVACAO.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="col-span-2 space-y-1.5">
               <Label>Indicado por (opcional)</Label>
               <Select
@@ -315,6 +360,7 @@ export default function Alunos() {
               </Select>
             </div>
           </div>
+          {formError && <p className="text-sm text-destructive">{formError}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancelar

@@ -48,7 +48,19 @@ export interface Student {
   lastActivityDate: string;
   status: StudentStatus;
   referredBy?: string;
+  inactiveReason?: string;
 }
+
+export const MOTIVOS_INATIVACAO = [
+  "Não teve mais interesse",
+  "Mudou de cidade / se mudou",
+  "Motivos financeiros",
+  "Lesão ou problema de saúde",
+  "Falta de tempo",
+  "Aluno expulso",
+  "Mudou de academia",
+  "Outro",
+];
 
 export interface ClassGroup {
   id: string;
