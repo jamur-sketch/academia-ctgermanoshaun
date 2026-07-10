@@ -26,9 +26,10 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useStudents } from "@/hooks/useStudents";
 import { usePlans } from "@/hooks/usePlans";
-import { Gender, Student } from "@/lib/mockData";
+import { Gender, Student, StudentStatus } from "@/lib/mockData";
 
 const GENDER_LABEL: Record<Gender, string> = {
   masculino: "Masculino",
@@ -36,10 +37,61 @@ const GENDER_LABEL: Record<Gender, string> = {
   outro: "Outro",
 };
 
-function isActive(student: Student) {
-  const last = new Date(student.lastActivityDate);
-  const days = (Date.now() - last.getTime()) / 86400000;
-  return days <= 35;
+function StudentTable({
+  rows,
+  planName,
+  onEdit,
+  onDelete,
+}: {
+  rows: Student[];
+  planName: (id: string) => string;
+  onEdit: (s: Student) => void;
+  onDelete: (s: Student) => void;
+}) {
+  return (
+    <div className="rounded-xl border bg-card overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nome</TableHead>
+            <TableHead>Contato</TableHead>
+            <TableHead>Plano</TableHead>
+            <TableHead>Gênero</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((s) => (
+            <TableRow key={s.id}>
+              <TableCell className="font-medium">{s.name}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {s.phone}
+                {s.phone && s.email && <br />}
+                {s.email}
+              </TableCell>
+              <TableCell>{planName(s.planId)}</TableCell>
+              <TableCell>{GENDER_LABEL[s.gender]}</TableCell>
+              <TableCell className="text-right space-x-1">
+                <Button variant="ghost" size="icon" onClick={() => onEdit(s)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => onDelete(s)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+          {rows.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
+                Nenhum aluno encontrado.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
 
 type FormState = Omit<Student, "id">;
@@ -75,6 +127,9 @@ export default function Alunos() {
       ),
     [students, search]
   );
+
+  const ativos = useMemo(() => filtered.filter((s) => s.status === "ativo"), [filtered]);
+  const inativos = useMemo(() => filtered.filter((s) => s.status === "inativo"), [filtered]);
 
   const openNew = () => {
     setEditingId(null);
@@ -121,54 +176,28 @@ export default function Alunos() {
         />
       </div>
 
-      <div className="rounded-xl border bg-card overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Contato</TableHead>
-              <TableHead>Plano</TableHead>
-              <TableHead>Gênero</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((s) => (
-              <TableRow key={s.id}>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {s.phone}
-                  <br />
-                  {s.email}
-                </TableCell>
-                <TableCell>{planName(s.planId)}</TableCell>
-                <TableCell>{GENDER_LABEL[s.gender]}</TableCell>
-                <TableCell>
-                  <Badge variant={isActive(s) ? "default" : "secondary"}>
-                    {isActive(s) ? "Ativo" : "Inativo"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-1">
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(s)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(s)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
-                  Nenhum aluno encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <Tabs defaultValue="ativos">
+        <TabsList>
+          <TabsTrigger value="ativos">Ativos ({ativos.length})</TabsTrigger>
+          <TabsTrigger value="inativos">Inativos ({inativos.length})</TabsTrigger>
+        </TabsList>
+        <TabsContent value="ativos" className="mt-4">
+          <StudentTable
+            rows={ativos}
+            planName={planName}
+            onEdit={openEdit}
+            onDelete={setDeleteTarget}
+          />
+        </TabsContent>
+        <TabsContent value="inativos" className="mt-4">
+          <StudentTable
+            rows={inativos}
+            planName={planName}
+            onEdit={openEdit}
+            onDelete={setDeleteTarget}
+          />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
@@ -211,7 +240,7 @@ export default function Alunos() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-2 space-y-1.5">
+            <div className="space-y-1.5">
               <Label>Plano</Label>
               <Select value={form.planId} onValueChange={(v) => setForm({ ...form, planId: v })}>
                 <SelectTrigger>
@@ -223,6 +252,21 @@ export default function Alunos() {
                       {p.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Situação</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v: StudentStatus) => setForm({ ...form, status: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
