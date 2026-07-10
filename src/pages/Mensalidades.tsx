@@ -378,7 +378,11 @@ export default function Mensalidades() {
                         variant="outline"
                         className="h-7 text-xs"
                         onClick={() =>
-                          updateStudent(student.id, { status: "ativo", inactiveReason: "" })
+                          updateStudent(student.id, {
+                            status: "ativo",
+                            inactiveReason: "",
+                            inactiveSince: "",
+                          })
                         }
                       >
                         Reativar

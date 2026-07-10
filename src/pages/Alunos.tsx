@@ -161,6 +161,7 @@ const emptyForm: FormState = {
   lastActivityDate: new Date().toISOString().slice(0, 10),
   status: "ativo",
   inactiveReason: "",
+  inactiveSince: "",
 };
 
 export default function Alunos() {
@@ -229,7 +230,25 @@ export default function Alunos() {
       setFormError("Selecione o motivo da inatividade.");
       return;
     }
-    const data = { ...form, inactiveReason: form.status === "ativo" ? "" : form.inactiveReason };
+
+    const today = new Date().toISOString().slice(0, 10);
+    const original = editingId ? students.find((s) => s.id === editingId) : undefined;
+    const wasInactive = original?.status === "inativo";
+
+    let inactiveSince = form.inactiveSince || "";
+    if (form.status === "inativo") {
+      // registra a data só quando é uma NOVA saída (ativo -> inativo).
+      // importados que já vinham inativos permanecem sem data.
+      if (!wasInactive) inactiveSince = today;
+    } else {
+      inactiveSince = "";
+    }
+
+    const data = {
+      ...form,
+      inactiveReason: form.status === "ativo" ? "" : form.inactiveReason,
+      inactiveSince,
+    };
     if (editingId) {
       updateStudent(editingId, data);
     } else {

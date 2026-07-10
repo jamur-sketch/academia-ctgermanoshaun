@@ -60,9 +60,14 @@ export default function Inicio() {
   const now = new Date();
 
   const ativos = useMemo(() => students.filter((s) => s.status === "ativo"), [students]);
-  const inativos = useMemo(() => students.filter((s) => s.status === "inativo"), [students]);
-  const total = ativos.length + inativos.length;
-  const taxaEvasao = total > 0 ? Math.round((inativos.length / total) * 100) : 0;
+  // Evasão considera apenas saídas registradas no sistema (com data),
+  // ignorando os inativos que já vieram importados da planilha.
+  const evadidos = useMemo(
+    () => students.filter((s) => s.status === "inativo" && s.inactiveSince),
+    [students]
+  );
+  const baseEvasao = ativos.length + evadidos.length;
+  const taxaEvasao = baseEvasao > 0 ? Math.round((evadidos.length / baseEvasao) * 100) : 0;
 
   const newStudentsMonth = ativos.filter((s) => {
     const d = new Date(s.joinDate);
@@ -72,14 +77,14 @@ export default function Inicio() {
   // Motivos de evasão
   const reasons = useMemo(() => {
     const map = new Map<string, number>();
-    inativos.forEach((s) => {
+    evadidos.forEach((s) => {
       const r = s.inactiveReason || "Não informado";
       map.set(r, (map.get(r) ?? 0) + 1);
     });
     return Array.from(map.entries())
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
-  }, [inativos]);
+  }, [evadidos]);
 
   const maiorMotivo = reasons[0];
 
@@ -131,8 +136,8 @@ export default function Inicio() {
         <Kpi
           icon={UserMinus}
           label="Alunos que saíram"
-          value={inativos.length}
-          sub="total desde o início"
+          value={evadidos.length}
+          sub="saídas registradas no sistema"
         />
         <Kpi
           icon={TrendingDown}
@@ -157,8 +162,8 @@ export default function Inicio() {
                 <p className="text-sm text-muted-foreground mt-1">
                   {maiorMotivo.value}{" "}
                   {maiorMotivo.value === 1 ? "aluno" : "alunos"} — {" "}
-                  {inativos.length > 0
-                    ? Math.round((maiorMotivo.value / inativos.length) * 100)
+                  {evadidos.length > 0
+                    ? Math.round((maiorMotivo.value / evadidos.length) * 100)
                     : 0}
                   % das saídas
                 </p>

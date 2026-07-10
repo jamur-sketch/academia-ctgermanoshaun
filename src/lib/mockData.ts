@@ -49,6 +49,7 @@ export interface Student {
   status: StudentStatus;
   referredBy?: string;
   inactiveReason?: string;
+  inactiveSince?: string;
 }
 
 export const MOTIVOS_INATIVACAO = [

@@ -20,6 +20,7 @@ function fromRow(r: Record<string, unknown>): Student {
     status: (r.status as Student["status"]) ?? "ativo",
     referredBy: (r.referred_by as string) ?? "",
     inactiveReason: (r.inactive_reason as string) ?? "",
+    inactiveSince: (r.inactive_since as string) ?? "",
   };
 }
 
@@ -40,6 +41,7 @@ function toRow(s: Partial<Student>): Record<string, unknown> {
   if (s.status !== undefined) r.status = s.status;
   if (s.referredBy !== undefined) r.referred_by = s.referredBy || null;
   if (s.inactiveReason !== undefined) r.inactive_reason = s.inactiveReason || null;
+  if (s.inactiveSince !== undefined) r.inactive_since = dateOrNull(s.inactiveSince);
   return r;
 }
 
