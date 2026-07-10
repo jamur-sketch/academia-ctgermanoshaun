@@ -107,7 +107,9 @@ export default function Chamada() {
             >
               <div className="min-w-0">
                 <p className="font-medium truncate">{s.name}</p>
-                <p className="text-xs text-muted-foreground">{planName.get(s.planId) ?? "—"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {s.planIds.map((id) => planName.get(id)).filter(Boolean).join(", ") || "—"}
+                </p>
               </div>
               <div
                 className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${

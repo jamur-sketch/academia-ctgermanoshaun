@@ -44,7 +44,7 @@ function StudentTable({
   onDelete,
 }: {
   rows: Student[];
-  planName: (id: string) => string;
+  planName: (ids: string[]) => string;
   onEdit: (s: Student) => void;
   onDelete: (s: Student) => void;
 }) {
@@ -69,7 +69,7 @@ function StudentTable({
                 {s.phone && s.email && <br />}
                 {s.email}
               </TableCell>
-              <TableCell>{planName(s.planId)}</TableCell>
+              <TableCell>{planName(s.planIds)}</TableCell>
               <TableCell>{GENDER_LABEL[s.gender]}</TableCell>
               <TableCell className="text-right space-x-1">
                 <Button variant="ghost" size="icon" onClick={() => onEdit(s)}>
@@ -102,7 +102,7 @@ const emptyForm: FormState = {
   email: "",
   birthDate: "",
   gender: "masculino",
-  planId: "",
+  planIds: [],
   joinDate: new Date().toISOString().slice(0, 10),
   lastActivityDate: new Date().toISOString().slice(0, 10),
   status: "ativo",
@@ -117,7 +117,18 @@ export default function Alunos() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
 
-  const planName = (id: string) => plans.find((p) => p.id === id)?.name ?? "—";
+  const planName = (ids: string[]) => {
+    const names = ids.map((id) => plans.find((p) => p.id === id)?.name).filter(Boolean);
+    return names.length > 0 ? names.join(", ") : "—";
+  };
+
+  const togglePlan = (id: string) =>
+    setForm((prev) => ({
+      ...prev,
+      planIds: prev.planIds.includes(id)
+        ? prev.planIds.filter((p) => p !== id)
+        : [...prev.planIds, id],
+    }));
 
   const filtered = useMemo(
     () =>
@@ -133,7 +144,7 @@ export default function Alunos() {
 
   const openNew = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, planId: plans[0]?.id ?? "" });
+    setForm({ ...emptyForm, planIds: [] });
     setDialogOpen(true);
   };
 
@@ -240,22 +251,32 @@ export default function Alunos() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label>Plano</Label>
-              <Select value={form.planId} onValueChange={(v) => setForm({ ...form, planId: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um plano" />
-                </SelectTrigger>
-                <SelectContent>
-                  {plans.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Planos / modalidades</Label>
+              <div className="flex flex-wrap gap-2">
+                {plans.map((p) => {
+                  const active = form.planIds.includes(p.id);
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => togglePlan(p.id)}
+                      className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-foreground border-border hover:bg-muted"
+                      }`}
+                    >
                       {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Pode marcar mais de um (ex: Muay Thai + Personal).
+              </p>
             </div>
-            <div className="space-y-1.5">
+            <div className="col-span-2 space-y-1.5">
               <Label>Situação</Label>
               <Select
                 value={form.status}

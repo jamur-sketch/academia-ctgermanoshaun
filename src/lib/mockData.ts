@@ -43,7 +43,7 @@ export interface Student {
   email: string;
   birthDate: string;
   gender: Gender;
-  planId: string;
+  planIds: string[];
   joinDate: string;
   lastActivityDate: string;
   status: StudentStatus;
@@ -117,7 +117,7 @@ export const seedStudents: Student[] = Array.from({ length: 36 }).map((_, i) => 
     email: `aluno${i + 1}@email.com`,
     birthDate: `${birthYear}-0${(i % 9) + 1}-1${i % 9}`,
     gender,
-    planId: seedPlans[i % seedPlans.length].id,
+    planIds: [seedPlans[i % seedPlans.length].id],
     joinDate: randomDateWithinMonths(11),
     lastActivityDate: randomDateWithinMonths(2),
     status: "ativo" as StudentStatus,

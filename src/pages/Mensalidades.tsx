@@ -97,8 +97,12 @@ export default function Mensalidades() {
     return map;
   }, [plans]);
 
-  const modalityOf = (studentId: string, planId: string) =>
-    classModality.get(studentId) ?? planName.get(planId) ?? "—";
+  const modalityOf = (studentId: string, planIds: string[]) => {
+    const fromClass = classModality.get(studentId);
+    if (fromClass) return fromClass;
+    const names = planIds.map((id) => planName.get(id)).filter(Boolean);
+    return names.length > 0 ? names.join(", ") : "—";
+  };
 
   const makeRows = (list: typeof students) =>
     list
@@ -260,7 +264,7 @@ export default function Mensalidades() {
                 <TableRow key={student.id}>
                   <TableCell className="font-medium whitespace-nowrap">{student.name}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {modalityOf(student.id, student.planId)}
+                    {modalityOf(student.id, student.planIds)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     {paid && amountPaid !== null ? (
@@ -364,7 +368,7 @@ export default function Mensalidades() {
                   <TableRow key={student.id} className="opacity-60">
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {modalityOf(student.id, student.planId)}
+                      {modalityOf(student.id, student.planIds)}
                     </TableCell>
                     <TableCell className="text-right">{fmt(config.monthlyFee)}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">{config.notes || "—"}</TableCell>

@@ -126,7 +126,7 @@ export default function Relatorios() {
   const byPlan = useMemo(() => {
     return plans.map((p) => ({
       name: p.name,
-      value: students.filter((s) => s.planId === p.id).length,
+      value: students.filter((s) => s.planIds.includes(p.id)).length,
     }));
   }, [plans, students]);
 

@@ -9,7 +9,12 @@ function fromRow(r: Record<string, unknown>): Student {
     email: (r.email as string) ?? "",
     birthDate: (r.birth_date as string) ?? "",
     gender: (r.gender as Student["gender"]) ?? "masculino",
-    planId: (r.plan_id as string) ?? "",
+    planIds:
+      (r.plan_ids as string[] | null) && (r.plan_ids as string[]).length > 0
+        ? (r.plan_ids as string[])
+        : r.plan_id
+        ? [r.plan_id as string]
+        : [],
     joinDate: (r.join_date as string) ?? "",
     lastActivityDate: (r.last_activity_date as string) ?? "",
     status: (r.status as Student["status"]) ?? "ativo",
@@ -25,7 +30,10 @@ function toRow(s: Partial<Student>): Record<string, unknown> {
   if (s.email !== undefined) r.email = s.email;
   if (s.birthDate !== undefined) r.birth_date = dateOrNull(s.birthDate);
   if (s.gender !== undefined) r.gender = s.gender;
-  if (s.planId !== undefined) r.plan_id = s.planId || null;
+  if (s.planIds !== undefined) {
+    r.plan_ids = s.planIds;
+    r.plan_id = s.planIds[0] ?? null; // mantém a coluna antiga sincronizada
+  }
   if (s.joinDate !== undefined) r.join_date = dateOrNull(s.joinDate);
   if (s.lastActivityDate !== undefined) r.last_activity_date = dateOrNull(s.lastActivityDate);
   if (s.status !== undefined) r.status = s.status;
