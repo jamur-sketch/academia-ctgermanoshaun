@@ -10,6 +10,7 @@ import Graduacoes from "@/pages/Graduacoes";
 import Configuracoes from "@/pages/Configuracoes";
 import Mensalidades from "@/pages/Mensalidades";
 import Chamada from "@/pages/Chamada";
+import Inicio from "@/pages/Inicio";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import ChangePassword from "@/pages/ChangePassword";
@@ -30,7 +31,8 @@ function AppRoutes() {
       <AppLayout>
         <main className="flex-1 min-w-0">
           <Routes>
-            <Route path="/" element={<Navigate to="/alunos" replace />} />
+            <Route path="/" element={<Navigate to="/inicio" replace />} />
+            <Route path="/inicio" element={<Inicio />} />
             <Route path="/alunos" element={<Alunos />} />
             <Route path="/planos" element={<Planos />} />
             <Route path="/aulas" element={<Aulas />} />

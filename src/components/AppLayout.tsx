@@ -11,6 +11,7 @@ import {
   Menu,
   CalendarCheck,
   ClipboardCheck,
+  LayoutDashboard,
   LogOut,
 } from "lucide-react";
 import {
@@ -32,6 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
+  { title: "Início", url: "/inicio", icon: LayoutDashboard },
   { title: "Alunos", url: "/alunos", icon: Users },
   { title: "Planos", url: "/planos", icon: CreditCard },
   { title: "Aulas", url: "/aulas", icon: Dumbbell },
