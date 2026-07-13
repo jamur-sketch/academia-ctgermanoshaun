@@ -19,13 +19,7 @@ import {
 import { useStudents } from "@/modules/alunos/useStudents";
 import { usePlans } from "@/modules/planos/usePlans";
 
-const PIE_COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-];
+import { PIE_COLORS } from "@/shared/constants";
 
 function Kpi({
   icon: Icon,

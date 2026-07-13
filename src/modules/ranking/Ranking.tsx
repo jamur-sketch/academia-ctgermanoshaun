@@ -22,10 +22,7 @@ const PT_PAGAMENTO = 20;
 const PT_GRADUACAO = 50;
 const PT_MES_CASA = 1;
 
-const MONTH_NAMES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-];
+import { MONTH_NAMES } from "@/shared/constants";
 
 function paidOnTime(paidDate: string | null): boolean {
   if (!paidDate) return false;

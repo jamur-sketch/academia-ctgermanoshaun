@@ -22,19 +22,7 @@ import { useClasses } from "@/modules/aulas/useClasses";
 import { useFinancialEntries } from "@/modules/financeiro/useFinancialEntries";
 import { EntryType } from "@/shared/domain";
 
-const MONTH_NAMES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-];
-const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-const PIE_COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-];
+import { MONTH_NAMES, MONTH_SHORT, PIE_COLORS } from "@/shared/constants";
 
 const revenueChartConfig: ChartConfig = {
   value: { label: "Receita", color: "hsl(var(--chart-1))" },

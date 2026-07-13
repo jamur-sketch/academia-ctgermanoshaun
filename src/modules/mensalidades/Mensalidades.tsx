@@ -37,11 +37,7 @@ import {
   isLate,
 } from "@/modules/mensalidades/useMonthlyPayments";
 
-const MONTH_NAMES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-];
-const PAYMENT_METHODS = ["Pix", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Boleto"];
+import { MONTH_NAMES, PAYMENT_METHODS } from "@/shared/constants";
 
 function fmt(amount: number) {
   return amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

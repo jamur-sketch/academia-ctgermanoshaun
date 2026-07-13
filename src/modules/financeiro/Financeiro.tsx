@@ -34,11 +34,7 @@ const CATEGORIES: Record<EntryType, string[]> = {
   receita: ["Mensalidade", "Matrícula", "Produto", "Aula Avulsa"],
   despesa: ["Aluguel", "Salários", "Equipamentos", "Marketing", "Energia/Água"],
 };
-const PAYMENT_METHODS = ["Pix", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Boleto"];
-const MONTH_NAMES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-];
+import { MONTH_NAMES, PAYMENT_METHODS } from "@/shared/constants";
 
 type FormState = Omit<FinancialEntry, "id">;
 const emptyForm = (): FormState => ({
