@@ -1,20 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import AppLayout from "@/components/AppLayout";
-import Alunos from "@/pages/Alunos";
-import Planos from "@/pages/Planos";
-import Aulas from "@/pages/Aulas";
-import Financeiro from "@/pages/Financeiro";
-import Relatorios from "@/pages/Relatorios";
-import Ranking from "@/pages/Ranking";
-import Graduacoes from "@/pages/Graduacoes";
-import Configuracoes from "@/pages/Configuracoes";
-import Mensalidades from "@/pages/Mensalidades";
-import Chamada from "@/pages/Chamada";
-import Inicio from "@/pages/Inicio";
-import NotFound from "@/pages/NotFound";
-import Login from "@/pages/Login";
-import ChangePassword from "@/pages/ChangePassword";
-import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import AppLayout from "@/shared/components/AppLayout";
+import Alunos from "@/modules/alunos/Alunos";
+import Planos from "@/modules/planos/Planos";
+import Aulas from "@/modules/aulas/Aulas";
+import Financeiro from "@/modules/financeiro/Financeiro";
+import Relatorios from "@/modules/relatorios/Relatorios";
+import Ranking from "@/modules/ranking/Ranking";
+import Graduacoes from "@/modules/graduacoes/Graduacoes";
+import Configuracoes from "@/modules/configuracoes/Configuracoes";
+import Mensalidades from "@/modules/mensalidades/Mensalidades";
+import Chamada from "@/modules/chamada/Chamada";
+import Inicio from "@/modules/inicio/Inicio";
+import NotFound from "@/shared/components/NotFound";
+import Login from "@/modules/auth/Login";
+import ChangePassword from "@/modules/auth/ChangePassword";
+import { AuthProvider, useAuth } from "@/shared/hooks/useAuth";
 
 function Splash() {
   return (
