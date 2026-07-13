@@ -1,32 +1,8 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent } from "@/shared/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/shared/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/ui/dialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/shared/ui/select";
 import { useStudents } from "@/modules/alunos/useStudents";
 import { useClasses } from "@/modules/aulas/useClasses";
 import { usePlans } from "@/modules/planos/usePlans";
@@ -36,12 +12,12 @@ import {
   effectiveFee,
   isLate,
 } from "@/modules/mensalidades/useMonthlyPayments";
-
-import { MONTH_NAMES, PAYMENT_METHODS } from "@/shared/constants";
-
-function fmt(amount: number) {
-  return amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { MONTH_NAMES } from "@/shared/constants";
+import { PayForm, ConfigForm, fmtBRL } from "./types";
+import { MensalidadesTable } from "./components/MensalidadesTable";
+import { InativosSection } from "./components/InativosSection";
+import { PagamentoDialog } from "./components/PagamentoDialog";
+import { ConfigMensalidadeDialog } from "./components/ConfigMensalidadeDialog";
 
 export default function Mensalidades() {
   const { students, updateStudent } = useStudents();
@@ -54,18 +30,12 @@ export default function Mensalidades() {
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
   const [search, setSearch] = useState("");
+  const [showInativos, setShowInativos] = useState(false);
 
-  // dialog para marcar como pago
-  const [payDialog, setPayDialog] = useState<{
-    studentId: string;
-    name: string;
-    baseFee: number;
-  } | null>(null);
-  const [payForm, setPayForm] = useState({ amount: 0, paymentMethod: "Pix", notes: "" });
-
-  // dialog para editar config do aluno
+  const [payDialog, setPayDialog] = useState<{ studentId: string; name: string; baseFee: number } | null>(null);
+  const [payForm, setPayForm] = useState<PayForm>({ amount: 0, paymentMethod: "Pix", notes: "" });
   const [configDialog, setConfigDialog] = useState<{ studentId: string; name: string } | null>(null);
-  const [configForm, setConfigForm] = useState({ monthlyFee: 100, paymentMethod: "Pix", notes: "" });
+  const [configForm, setConfigForm] = useState<ConfigForm>({ monthlyFee: 100, paymentMethod: "Pix", notes: "" });
 
   const shiftMonth = (delta: number) => {
     let m = month + delta;
@@ -118,37 +88,26 @@ export default function Mensalidades() {
     () => makeRows(students.filter((s) => s.status === "inativo")),
     [students, search, month, year, getConfig, getPayment]
   );
-  const rows = ativos;
-
-  const [showInativos, setShowInativos] = useState(false);
 
   // KPIs — baseado apenas nos ativos
   const totalAlunos = ativos.length;
-  const pagos = rows.filter((r) => r.payment?.paid).length;
+  const pagos = ativos.filter((r) => r.payment?.paid).length;
   const pendentes = totalAlunos - pagos;
-  const valorRecebido = rows.reduce(
+  const valorRecebido = ativos.reduce(
     (s, r) => s + (r.payment?.paid && r.payment.amountPaid ? r.payment.amountPaid : 0),
     0
   );
-  const valorEsperado = rows.reduce((s, r) => s + r.currentFee, 0);
+  const valorEsperado = ativos.reduce((s, r) => s + r.currentFee, 0);
 
   const openPayDialog = (studentId: string, name: string, baseFee: number) => {
     const config = getConfig(studentId);
-    const amount = effectiveFee(config.monthlyFee);
-    setPayForm({ amount, paymentMethod: config.paymentMethod, notes: "" });
+    setPayForm({ amount: effectiveFee(config.monthlyFee), paymentMethod: config.paymentMethod, notes: "" });
     setPayDialog({ studentId, name, baseFee });
   };
 
   const confirmPay = () => {
     if (!payDialog) return;
-    markPaid(
-      payDialog.studentId,
-      month,
-      year,
-      payForm.amount,
-      payForm.paymentMethod,
-      payForm.notes
-    );
+    markPaid(payDialog.studentId, month, year, payForm.amount, payForm.paymentMethod, payForm.notes);
     setPayDialog(null);
   };
 
@@ -216,13 +175,13 @@ export default function Mensalidades() {
         <Card>
           <CardContent className="pt-5 pb-4">
             <p className="text-xs text-muted-foreground">Recebido</p>
-            <p className="text-xl font-bold text-green-600">{fmt(valorRecebido)}</p>
+            <p className="text-xl font-bold text-green-600">{fmtBRL(valorRecebido)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4">
             <p className="text-xs text-muted-foreground">Esperado</p>
-            <p className="text-xl font-bold">{fmt(valorEsperado)}</p>
+            <p className="text-xl font-bold">{fmtBRL(valorEsperado)}</p>
           </CardContent>
         </Card>
       </div>
@@ -235,266 +194,46 @@ export default function Mensalidades() {
         className="max-w-sm"
       />
 
-      {/* Tabela */}
-      <div className="rounded-xl border bg-card overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Aluno</TableHead>
-              <TableHead>Modalidade</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-              <TableHead>Forma de Pagamento</TableHead>
-              <TableHead>Observações</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Data Pagamento</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map(({ student, config, payment, currentFee }) => {
-              const paid = payment?.paid ?? false;
-              const paidDate = payment?.paidDate ?? null;
-              const amountPaid = payment?.amountPaid ?? null;
+      <MensalidadesTable
+        rows={ativos}
+        modalityOf={modalityOf}
+        isCurrentMonth={isCurrentMonth}
+        late={late}
+        onEditConfig={openConfigDialog}
+        onPay={openPayDialog}
+        onUnmark={(studentId) => unmarkPaid(studentId, month, year)}
+      />
 
-              return (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium whitespace-nowrap">{student.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {modalityOf(student.id, student.planIds)}
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap">
-                    {paid && amountPaid !== null ? (
-                      <span className="font-medium">{fmt(amountPaid)}</span>
-                    ) : (
-                      <span className={isCurrentMonth && late && config.monthlyFee === 100 ? "text-amber-600 font-medium" : ""}>
-                        {fmt(currentFee)}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {paid ? payment?.paymentMethod : config.paymentMethod}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm max-w-[160px] truncate">
-                    {paid ? (payment?.notes || "—") : (config.notes || "—")}
-                  </TableCell>
-                  <TableCell>
-                    {paid ? (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Pago</Badge>
-                    ) : isCurrentMonth && late ? (
-                      <Badge variant="destructive">Atrasado</Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-amber-600 border-amber-300">Pendente</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                    {paidDate
-                      ? new Date(paidDate + "T12:00:00").toLocaleDateString("pt-BR")
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground"
-                        title="Editar configuração"
-                        onClick={() => openConfigDialog(student.id, student.name)}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      {paid ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 text-muted-foreground hover:text-destructive gap-1"
-                          onClick={() => unmarkPaid(student.id, month, year)}
-                        >
-                          <XCircle className="h-3.5 w-3.5" />
-                          Desfazer
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="h-8 gap-1"
-                          onClick={() => openPayDialog(student.id, student.name, config.monthlyFee)}
-                        >
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Marcar pago
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-            {rows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
-                  Nenhum aluno encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <InativosSection
+        rows={inativos}
+        modalityOf={modalityOf}
+        show={showInativos}
+        onToggle={() => setShowInativos((v) => !v)}
+        onReactivate={(studentId) =>
+          updateStudent(studentId, { status: "ativo", inactiveReason: "", inactiveSince: "" })
+        }
+      />
 
-      {/* Seção de inativos */}
-      <div className="border rounded-xl overflow-hidden">
-        <button
-          className="w-full flex items-center justify-between px-5 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium text-muted-foreground"
-          onClick={() => setShowInativos((v) => !v)}
-        >
-          <span>Alunos inativos (PAROU) — {inativos.length}</span>
-          <span className="text-xs">{showInativos ? "▲ Ocultar" : "▼ Mostrar"}</span>
-        </button>
-        {showInativos && (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Aluno</TableHead>
-                  <TableHead>Modalidade</TableHead>
-                  <TableHead className="text-right">Valor</TableHead>
-                  <TableHead>Observações</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {inativos.map(({ student, config }) => (
-                  <TableRow key={student.id} className="opacity-60">
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {modalityOf(student.id, student.planIds)}
-                    </TableCell>
-                    <TableCell className="text-right">{fmt(config.monthlyFee)}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{config.notes || "—"}</TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 text-xs"
-                        onClick={() =>
-                          updateStudent(student.id, {
-                            status: "ativo",
-                            inactiveReason: "",
-                            inactiveSince: "",
-                          })
-                        }
-                      >
-                        Reativar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </div>
+      <PagamentoDialog
+        open={!!payDialog}
+        name={payDialog?.name ?? ""}
+        baseFee={payDialog?.baseFee ?? 0}
+        month={month}
+        year={year}
+        form={payForm}
+        setForm={setPayForm}
+        onClose={() => setPayDialog(null)}
+        onConfirm={confirmPay}
+      />
 
-      {/* Dialog: Marcar como pago */}
-      <Dialog open={!!payDialog} onOpenChange={(o) => !o && setPayDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Marcar como pago</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground -mt-2">
-            {payDialog?.name} — {MONTH_NAMES[month]}/{year}
-          </p>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label>Valor cobrado (R$)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={payForm.amount}
-                onChange={(e) => setPayForm({ ...payForm, amount: Number(e.target.value) })}
-              />
-              {payDialog && payDialog.baseFee === 100 && isLate() && (
-                <p className="text-xs text-amber-600">
-                  Após o dia 10 — valor ajustado para R$125.
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label>Forma de pagamento</Label>
-              <Select
-                value={payForm.paymentMethod}
-                onValueChange={(v) => setPayForm({ ...payForm, paymentMethod: v })}
-              >
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_METHODS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Observação</Label>
-              <Input
-                value={payForm.notes}
-                onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
-                placeholder="Opcional"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPayDialog(null)}>Cancelar</Button>
-            <Button onClick={confirmPay}>Confirmar pagamento</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog: Editar configuração do aluno */}
-      <Dialog open={!!configDialog} onOpenChange={(o) => !o && setConfigDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Configurar mensalidade</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground -mt-2">{configDialog?.name}</p>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label>Valor mensal (R$)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={configForm.monthlyFee}
-                onChange={(e) => setConfigForm({ ...configForm, monthlyFee: Number(e.target.value) })}
-              />
-              <p className="text-xs text-muted-foreground">
-                Padrão R$100. Valores diferentes não sofrem o ajuste do dia 10.
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Forma de pagamento padrão</Label>
-              <Select
-                value={configForm.paymentMethod}
-                onValueChange={(v) => setConfigForm({ ...configForm, paymentMethod: v })}
-              >
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_METHODS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Observações</Label>
-              <Input
-                value={configForm.notes}
-                onChange={(e) => setConfigForm({ ...configForm, notes: e.target.value })}
-                placeholder="Ex: paga sempre no dia 5, personal..."
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfigDialog(null)}>Cancelar</Button>
-            <Button onClick={confirmConfig}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfigMensalidadeDialog
+        open={!!configDialog}
+        name={configDialog?.name ?? ""}
+        form={configForm}
+        setForm={setConfigForm}
+        onClose={() => setConfigDialog(null)}
+        onConfirm={confirmConfig}
+      />
     </div>
   );
 }
