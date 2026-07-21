@@ -331,7 +331,7 @@ function MensalidadesTab({ studentId }: { studentId: string }) {
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">Chave PIX (celular)</p>
+              <p className="text-xs text-muted-foreground">Chave PIX (CPF)</p>
               <p className="font-mono font-medium truncate">{PIX_KEY}</p>
             </div>
             <Button size="sm" className="gap-1 shrink-0" onClick={copyPix}>
@@ -340,7 +340,7 @@ function MensalidadesTab({ studentId }: { studentId: string }) {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Após pagar, envie o comprovante para a recepção.
+            Após pagar, envie o comprovante para o Jamur (Responsável Financeiro).
           </p>
         </CardContent>
       </Card>
@@ -458,7 +458,7 @@ export default function StudentPortal() {
   if (!student) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-sm text-muted-foreground">Não encontramos seu cadastro. Fale com a recepção.</p>
+        <p className="text-sm text-muted-foreground">Não encontramos seu cadastro. Fale com o Jamur (Responsável Financeiro).</p>
         <Button variant="outline" onClick={() => signOut()}>Sair</Button>
       </div>
     );
