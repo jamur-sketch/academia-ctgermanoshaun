@@ -11,7 +11,6 @@ import Configuracoes from "@/modules/configuracoes/Configuracoes";
 import Mensalidades from "@/modules/mensalidades/Mensalidades";
 import Chamada from "@/modules/chamada/Chamada";
 import Inicio from "@/modules/inicio/Inicio";
-import NotFound from "@/shared/components/NotFound";
 import Login from "@/modules/auth/Login";
 import ChangePassword from "@/modules/auth/ChangePassword";
 import StudentAuth from "@/modules/portal/StudentAuth";
@@ -56,7 +55,7 @@ function StaffApp() {
           <Route path="/ranking" element={<Ranking />} />
           <Route path="/graduacoes" element={<Graduacoes />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       </main>
     </AppLayout>
