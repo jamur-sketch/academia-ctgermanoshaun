@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import AppLayout from "@/shared/components/AppLayout";
 import Alunos from "@/modules/alunos/Alunos";
 import Planos from "@/modules/planos/Planos";
@@ -28,51 +27,57 @@ function Splash() {
   );
 }
 
-function AppRoutes() {
+// Telas de acesso (sem login). O aluno tem endereço próprio: /aluno
+function EntryRoutes() {
+  const navigate = useNavigate();
   return (
-    <BrowserRouter>
-      <AppLayout>
-        <main className="flex-1 min-w-0">
-          <Routes>
-            <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/alunos" element={<Alunos />} />
-            <Route path="/planos" element={<Planos />} />
-            <Route path="/aulas" element={<Aulas />} />
-            <Route path="/chamada" element={<Chamada />} />
-            <Route path="/mensalidades" element={<Mensalidades />} />
-            <Route path="/financeiro" element={<Financeiro />} />
-            <Route path="/relatorios" element={<Relatorios />} />
-            <Route path="/ranking" element={<Ranking />} />
-            <Route path="/graduacoes" element={<Graduacoes />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-      </AppLayout>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/aluno" element={<StudentAuth onStaff={() => navigate("/")} />} />
+      <Route path="*" element={<Login onStudent={() => navigate("/aluno")} />} />
+    </Routes>
+  );
+}
+
+// App da equipe (autenticado como equipe)
+function StaffApp() {
+  return (
+    <AppLayout>
+      <main className="flex-1 min-w-0">
+        <Routes>
+          <Route path="/" element={<Navigate to="/inicio" replace />} />
+          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/alunos" element={<Alunos />} />
+          <Route path="/planos" element={<Planos />} />
+          <Route path="/aulas" element={<Aulas />} />
+          <Route path="/chamada" element={<Chamada />} />
+          <Route path="/mensalidades" element={<Mensalidades />} />
+          <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/relatorios" element={<Relatorios />} />
+          <Route path="/ranking" element={<Ranking />} />
+          <Route path="/graduacoes" element={<Graduacoes />} />
+          <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </AppLayout>
   );
 }
 
 function Gate() {
   const { session, loading, role } = useAuth();
   if (loading) return <Splash />;
-  if (!session) return <EntryScreen />;
+  if (!session) return <EntryRoutes />;
   if (role === "aluno") return <StudentPortal />;
   if (session.user.user_metadata?.must_change_password) return <ChangePassword />;
-  return <AppRoutes />;
-}
-
-function EntryScreen() {
-  const [mode, setMode] = useState<"equipe" | "aluno">("equipe");
-  if (mode === "aluno") return <StudentAuth onStaff={() => setMode("equipe")} />;
-  return <Login onStudent={() => setMode("aluno")} />;
+  return <StaffApp />;
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <Gate />
+      <BrowserRouter>
+        <Gate />
+      </BrowserRouter>
     </AuthProvider>
   );
 }
