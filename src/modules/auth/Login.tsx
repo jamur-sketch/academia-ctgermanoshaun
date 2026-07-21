@@ -4,7 +4,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { supabase } from "@/shared/lib/supabase";
 
-export default function Login() {
+export default function Login({ onStudent }: { onStudent?: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -68,6 +68,14 @@ export default function Login() {
         <p className="text-xs text-muted-foreground text-center mt-6">
           Acesso restrito à equipe da academia.
         </p>
+        {onStudent && (
+          <button
+            onClick={onStudent}
+            className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors mt-3"
+          >
+            Sou aluno — acessar o Portal do Aluno →
+          </button>
+        )}
       </div>
     </div>
   );

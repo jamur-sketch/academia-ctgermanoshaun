@@ -50,6 +50,24 @@ export interface Student {
   referredBy?: string;
   inactiveReason?: string;
   inactiveSince?: string;
+  // Cadastro do portal do aluno
+  cpf?: string;
+  address?: string;
+  addressNumber?: string;
+  neighborhood?: string;
+  instagram?: string;
+  facebook?: string;
+  targetWeight?: number;
+  consentData?: boolean;
+  consentDate?: string;
+  authUserId?: string;
+}
+
+export interface WeightEntry {
+  id: string;
+  studentId: string;
+  date: string;
+  weight: number;
 }
 
 export const MOTIVOS_INATIVACAO = [

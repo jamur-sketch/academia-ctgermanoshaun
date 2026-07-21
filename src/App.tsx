@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "@/shared/components/AppLayout";
 import Alunos from "@/modules/alunos/Alunos";
@@ -14,6 +15,8 @@ import Inicio from "@/modules/inicio/Inicio";
 import NotFound from "@/shared/components/NotFound";
 import Login from "@/modules/auth/Login";
 import ChangePassword from "@/modules/auth/ChangePassword";
+import StudentAuth from "@/modules/portal/StudentAuth";
+import StudentPortal from "@/modules/portal/StudentPortal";
 import { AuthProvider, useAuth } from "@/shared/hooks/useAuth";
 
 function Splash() {
@@ -52,11 +55,18 @@ function AppRoutes() {
 }
 
 function Gate() {
-  const { session, loading } = useAuth();
+  const { session, loading, role } = useAuth();
   if (loading) return <Splash />;
-  if (!session) return <Login />;
+  if (!session) return <EntryScreen />;
+  if (role === "aluno") return <StudentPortal />;
   if (session.user.user_metadata?.must_change_password) return <ChangePassword />;
   return <AppRoutes />;
+}
+
+function EntryScreen() {
+  const [mode, setMode] = useState<"equipe" | "aluno">("equipe");
+  if (mode === "aluno") return <StudentAuth onStaff={() => setMode("equipe")} />;
+  return <Login onStudent={() => setMode("aluno")} />;
 }
 
 export default function App() {
