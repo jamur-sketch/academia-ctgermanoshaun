@@ -151,6 +151,14 @@ export function StudentFormDialog({
             </Select>
           </div>
           <div className="col-span-2 space-y-1.5">
+            <Label>Data de entrada na academia</Label>
+            <Input
+              type="date"
+              value={form.joinDate}
+              onChange={(e) => setForm({ ...form, joinDate: e.target.value })}
+            />
+          </div>
+          <div className="col-span-2 space-y-1.5">
             <Label>Planos / modalidades</Label>
             <div className="flex flex-wrap gap-2">
               {plans.map((p) => {
