@@ -22,6 +22,7 @@ import {
 } from "@/shared/ui/select";
 import { useClasses } from "@/modules/aulas/useClasses";
 import { useStudents } from "@/modules/alunos/useStudents";
+import { useClassRequests } from "@/modules/aulas/useClassRequests";
 import { ClassGroup, ClassType, MODALITIES, Modality } from "@/shared/domain";
 
 const TYPE_LABEL: Record<ClassType, string> = {
@@ -311,6 +312,55 @@ function ClassList({ type }: { type: ClassType }) {
   );
 }
 
+function SolicitacoesSection() {
+  const { requests, resolve } = useClassRequests();
+  const { classes, enrollStudent } = useClasses();
+  const { students } = useStudents();
+
+  if (requests.length === 0) return null;
+
+  const studentName = (id: string) => students.find((s) => s.id === id)?.name ?? "Aluno";
+  const className = (id: string) => classes.find((c) => c.id === id)?.name ?? "Aula";
+
+  return (
+    <Card className="border-primary/40">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Users className="h-4 w-4 text-primary" />
+          Solicitações de aula ({requests.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <p className="text-sm text-muted-foreground -mt-1">
+          Alunos que pediram, pelo portal, para fazer mais aulas.
+        </p>
+        {requests.map((r) => (
+          <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 border rounded-lg p-3">
+            <div className="min-w-0">
+              <p className="font-medium">{studentName(r.studentId)}</p>
+              <p className="text-xs text-muted-foreground">quer fazer: {className(r.classId)}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => resolve(r.id)}>
+                Dispensar
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  enrollStudent(r.classId, r.studentId);
+                  resolve(r.id);
+                }}
+              >
+                Matricular
+              </Button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Aulas() {
   return (
     <div className="p-6 md:p-8 space-y-6">
@@ -318,6 +368,8 @@ export default function Aulas() {
         <h1 className="text-2xl font-bold tracking-tight">Aulas</h1>
         <p className="text-sm text-muted-foreground">Turmas por modalidade e aulas particulares</p>
       </div>
+
+      <SolicitacoesSection />
 
       <Tabs defaultValue="turma">
         <TabsList>

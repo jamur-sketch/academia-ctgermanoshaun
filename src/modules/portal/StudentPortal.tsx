@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, User, Award, CreditCard, Plus, Pencil, Copy, Check, Trophy } from "lucide-react";
+import { LogOut, User, Award, CreditCard, Plus, Pencil, Copy, Check, Trophy, Dumbbell } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -25,6 +25,7 @@ import { useMyStudent } from "./useMyStudent";
 import { useWeightEntries } from "./useWeightEntries";
 import { useMyPayments } from "./useMyPayments";
 import { useMyGraduations } from "./useMyGraduations";
+import { usePortalClasses } from "./usePortalClasses";
 
 const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const PIX_KEY = "01306074010";
@@ -367,6 +368,79 @@ function MensalidadesTab({ studentId }: { studentId: string }) {
   );
 }
 
+/* ---------- Aulas ---------- */
+const TYPE_LABEL: Record<string, string> = { turma: "Turma", personal: "Personal", gratis: "Aula" };
+
+function AulasTab({ studentId }: { studentId: string }) {
+  const { classes, myClassIds, requestedIds, loading, requestClass } = usePortalClasses(studentId);
+
+  const minhas = classes.filter((c) => myClassIds.includes(c.id));
+  const outras = classes.filter((c) => !myClassIds.includes(c.id));
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader><CardTitle className="text-base">Minhas aulas</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {loading && <p className="text-sm text-muted-foreground py-4 text-center">Carregando...</p>}
+          {!loading && minhas.length === 0 && (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              Você ainda não está matriculado em nenhuma aula.
+            </p>
+          )}
+          {minhas.map((c) => (
+            <div key={c.id} className="flex items-center justify-between border rounded-lg p-3">
+              <div className="min-w-0">
+                <p className="font-medium truncate">{c.name}</p>
+                <p className="text-xs text-muted-foreground">{c.schedule}</p>
+              </div>
+              <Badge variant="secondary" className="shrink-0">{c.modality}</Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Quero fazer mais aulas</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-sm text-muted-foreground mb-1">
+            Tem interesse em outra modalidade? Toque em "Tenho interesse" e a equipe entra em contato.
+          </p>
+          {outras.length === 0 && (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              Nenhuma outra aula disponível no momento.
+            </p>
+          )}
+          {outras.map((c) => {
+            const requested = requestedIds.includes(c.id);
+            return (
+              <div key={c.id} className="flex items-center justify-between gap-3 border rounded-lg p-3">
+                <div className="min-w-0">
+                  <p className="font-medium truncate">
+                    {c.name} <span className="text-muted-foreground font-normal">· {TYPE_LABEL[c.type] ?? ""}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">{c.modality} · {c.schedule}</p>
+                </div>
+                {requested ? (
+                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100 shrink-0">
+                    Interesse enviado
+                  </Badge>
+                ) : (
+                  <Button size="sm" variant="outline" className="shrink-0" onClick={() => requestClass(c.id)}>
+                    Tenho interesse
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 /* ---------- Portal ---------- */
 export default function StudentPortal() {
   const { signOut } = useAuth();
@@ -412,17 +486,23 @@ export default function StudentPortal() {
 
       <div className="max-w-2xl mx-auto p-4 sm:p-6">
         <Tabs defaultValue="perfil">
-          <TabsList className="w-full">
-            <TabsTrigger value="perfil" className="flex-1 gap-1"><User className="h-4 w-4" /> Perfil</TabsTrigger>
-            <TabsTrigger value="evolucao" className="flex-1 gap-1"><Award className="h-4 w-4" /> Evolução</TabsTrigger>
-            <TabsTrigger value="mensalidades" className="flex-1 gap-1"><CreditCard className="h-4 w-4" /> Mensalidades</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <TabsList className="w-full">
+              <TabsTrigger value="perfil" className="flex-1 gap-1"><User className="h-4 w-4" /> Perfil</TabsTrigger>
+              <TabsTrigger value="evolucao" className="flex-1 gap-1"><Award className="h-4 w-4" /> Evolução</TabsTrigger>
+              <TabsTrigger value="aulas" className="flex-1 gap-1"><Dumbbell className="h-4 w-4" /> Aulas</TabsTrigger>
+              <TabsTrigger value="mensalidades" className="flex-1 gap-1"><CreditCard className="h-4 w-4" /> Financeiro</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="perfil" className="mt-6">
             <PerfilTab student={student} planNames={planNames} onSave={updateMyStudent} />
           </TabsContent>
           <TabsContent value="evolucao" className="mt-6">
             <EvolucaoTab studentId={student.id} targetWeight={student.targetWeight} />
+          </TabsContent>
+          <TabsContent value="aulas" className="mt-6">
+            <AulasTab studentId={student.id} />
           </TabsContent>
           <TabsContent value="mensalidades" className="mt-6">
             <MensalidadesTab studentId={student.id} />
