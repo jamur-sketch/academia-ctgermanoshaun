@@ -164,14 +164,16 @@ function ProductsTab() {
       <Card>
         <CardHeader><CardTitle className="text-base">Pagamento dos pedidos (PIX)</CardTitle></CardHeader>
         <CardContent className="space-y-2">
-          <Label>Código PIX "copia e cola" (do seu banco)</Label>
+          <Label>Chave PIX (CPF, celular, e-mail ou aleatória)</Label>
           <Input
             value={pixInput ?? pix}
             onChange={(e) => setPixInput(e.target.value)}
-            placeholder="Cole aqui o código PIX que o banco gera"
+            placeholder="ex: 01306074010 (CPF) — a mesma que você usa na InfinityPay"
           />
           <p className="text-xs text-muted-foreground">
-            O aluno vê o QR gerado a partir desse código na hora de pagar. Deixe em branco para não mostrar QR.
+            O sistema gera o QR com o <strong>valor exato de cada pedido</strong> a partir dessa chave.
+            Não precisa emitir código no banco. (Se você já tiver um código "copia e cola" completo,
+            também pode colar aqui.)
           </p>
           <Button size="sm" onClick={() => savePix((pixInput ?? pix).trim())} disabled={pixInput === null}>
             Salvar PIX

@@ -20,6 +20,7 @@ import {
   SelectItem,
 } from "@/shared/ui/select";
 import { QRCodePix } from "@/shared/components/QRCodePix";
+import { pixForAmount } from "@/shared/lib/pix";
 import { Product, Order } from "@/shared/domain";
 import { usePortalStore } from "./usePortalStore";
 import { useAppSetting } from "@/modules/pedidos/useAppSettings";
@@ -30,7 +31,7 @@ function brl(v: number) {
 
 export default function StoreTab({ studentId }: { studentId: string }) {
   const { products, orders, loading, createOrder } = usePortalStore(studentId);
-  const { value: pix } = useAppSetting("order_pix");
+  const { value: pixKey } = useAppSetting("order_pix");
 
   const [pedir, setPedir] = useState<Product | null>(null);
   const [size, setSize] = useState("");
@@ -54,17 +55,18 @@ export default function StoreTab({ studentId }: { studentId: string }) {
     setPedir(null);
   };
 
+  // valor a pagar no dialog: entrada (50%) se ainda não pagou, senão o restante
+  const payAmount = pay ? (!pay.depositPaid ? pay.deposit : pay.remaining) : 0;
+  const payLabel = pay && !pay.depositPaid ? "entrada (50%)" : "restante (50%)";
+  const pixCode = pixForAmount(pixKey, payAmount); // código gerado com o valor exato
+
   const copyPix = async () => {
     try {
-      await navigator.clipboard.writeText(pix);
+      await navigator.clipboard.writeText(pixCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* ignore */ }
   };
-
-  // valor a pagar no dialog: entrada (50%) se ainda não pagou, senão o restante
-  const payAmount = pay ? (!pay.depositPaid ? pay.deposit : pay.remaining) : 0;
-  const payLabel = pay && !pay.depositPaid ? "entrada (50%)" : "restante (50%)";
 
   return (
     <div className="space-y-4">
@@ -188,8 +190,8 @@ export default function StoreTab({ studentId }: { studentId: string }) {
           <DialogHeader><DialogTitle>Pagar {payLabel}</DialogTitle></DialogHeader>
           <div className="flex flex-col items-center gap-3 py-2">
             <p className="text-2xl font-bold">{brl(payAmount)}</p>
-            <QRCodePix value={pix} size={200} />
-            {pix && (
+            <QRCodePix value={pixCode} size={200} />
+            {pixCode && (
               <Button variant="outline" size="sm" className="gap-1" onClick={copyPix}>
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 {copied ? "Copiado!" : "Copiar código PIX"}
