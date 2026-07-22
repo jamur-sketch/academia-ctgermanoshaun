@@ -42,8 +42,9 @@ export default function StoreTab({ studentId }: { studentId: string }) {
   const [pay, setPay] = useState<Order | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Só mostra produtos com preço definido (esconde placeholders/vazios).
   const sortedProducts = useMemo(
-    () => [...products].sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
+    () => products.filter((p) => p.price > 0).sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
     [products]
   );
 
