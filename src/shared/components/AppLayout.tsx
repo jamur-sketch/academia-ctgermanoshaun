@@ -12,6 +12,7 @@ import {
   CalendarCheck,
   ClipboardCheck,
   LayoutDashboard,
+  Package,
   LogOut,
 } from "lucide-react";
 import {
@@ -39,6 +40,7 @@ const navItems = [
   { title: "Aulas", url: "/aulas", icon: Dumbbell },
   { title: "Graduações", url: "/graduacoes", icon: Award },
   { title: "Mensalidades", url: "/mensalidades", icon: CalendarCheck },
+  { title: "Pedidos", url: "/pedidos", icon: Package },
   { title: "Financeiro", url: "/financeiro", icon: DollarSign },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
   { title: "Configurações", url: "/configuracoes", icon: Settings },

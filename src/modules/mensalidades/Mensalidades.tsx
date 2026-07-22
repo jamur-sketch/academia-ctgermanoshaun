@@ -16,6 +16,7 @@ import { MONTH_NAMES } from "@/shared/constants";
 import { PayForm, ConfigForm, fmtBRL } from "./types";
 import { MensalidadesTable } from "./components/MensalidadesTable";
 import { InativosSection } from "./components/InativosSection";
+import { PedidosAReceber } from "./components/PedidosAReceber";
 import { PagamentoDialog } from "./components/PagamentoDialog";
 import { ConfigMensalidadeDialog } from "./components/ConfigMensalidadeDialog";
 
@@ -193,6 +194,8 @@ export default function Mensalidades() {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
+
+      <PedidosAReceber />
 
       <MensalidadesTable
         rows={ativos}

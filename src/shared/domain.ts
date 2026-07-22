@@ -70,6 +70,56 @@ export interface WeightEntry {
   weight: number;
 }
 
+export const PRODUCT_CATEGORIES = ["Camiseta", "Short", "Top", "Conjunto"];
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  video: string;
+  sizes: string[];
+  active: boolean;
+}
+
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  size: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export type OrderStatus = "aguardando" | "confirmado" | "entregue" | "cancelado";
+
+export interface Order {
+  id: string;
+  studentId: string;
+  status: OrderStatus;
+  total: number;
+  deposit: number;
+  remaining: number;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  remainingDue: string | null;
+  orderNumber: string;
+  notes: string;
+  createdAt: string;
+  items?: OrderItem[];
+}
+
+// Vídeos disponíveis para anexar aos produtos (em /public/produtos).
+export const PRODUCT_VIDEOS = [
+  "/produtos/produto1.mp4",
+  "/produtos/produto2.mp4",
+  "/produtos/produto3.mp4",
+  "/produtos/produto4.mp4",
+  "/produtos/produto5.mp4",
+];
+
 export const MOTIVOS_INATIVACAO = [
   "Não teve mais interesse",
   "Mudou de cidade / se mudou",

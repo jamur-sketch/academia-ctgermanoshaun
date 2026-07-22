@@ -11,6 +11,7 @@ import Configuracoes from "@/modules/configuracoes/Configuracoes";
 import Mensalidades from "@/modules/mensalidades/Mensalidades";
 import Chamada from "@/modules/chamada/Chamada";
 import Inicio from "@/modules/inicio/Inicio";
+import Pedidos from "@/modules/pedidos/Pedidos";
 import Login from "@/modules/auth/Login";
 import ChangePassword from "@/modules/auth/ChangePassword";
 import StudentAuth from "@/modules/portal/StudentAuth";
@@ -50,6 +51,7 @@ function StaffApp() {
           <Route path="/aulas" element={<Aulas />} />
           <Route path="/chamada" element={<Chamada />} />
           <Route path="/mensalidades" element={<Mensalidades />} />
+          <Route path="/pedidos" element={<Pedidos />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/relatorios" element={<Relatorios />} />
           <Route path="/ranking" element={<Ranking />} />

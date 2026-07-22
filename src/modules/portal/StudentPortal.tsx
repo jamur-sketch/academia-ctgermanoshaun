@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, User, Award, CreditCard, Plus, Pencil, Copy, Check, Trophy, Dumbbell } from "lucide-react";
+import { LogOut, User, Award, CreditCard, Plus, Pencil, Copy, Check, Trophy, Dumbbell, ShoppingBag } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -26,6 +26,8 @@ import { useWeightEntries } from "./useWeightEntries";
 import { useMyPayments } from "./useMyPayments";
 import { useMyGraduations } from "./useMyGraduations";
 import { usePortalClasses } from "./usePortalClasses";
+import { usePortalStore } from "./usePortalStore";
+import StoreTab from "./StoreTab";
 
 const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const PIX_KEY = "01306074010";
@@ -268,7 +270,10 @@ function EvolucaoTab({ studentId, targetWeight }: { studentId: string; targetWei
 /* ---------- Mensalidades ---------- */
 function MensalidadesTab({ studentId }: { studentId: string }) {
   const { payments, monthlyFee } = useMyPayments(studentId);
+  const { orders } = usePortalStore(studentId);
   const [copied, setCopied] = useState(false);
+
+  const pedidosAbertos = orders.filter((o) => o.depositPaid && !o.remainingPaid && o.status !== "cancelado");
 
   const now = new Date();
   const pagoEsteMes = payments.some(
@@ -364,6 +369,30 @@ function MensalidadesTab({ studentId }: { studentId: string }) {
           ))}
         </CardContent>
       </Card>
+
+      {pedidosAbertos.length > 0 && (
+        <Card className="border-amber-300">
+          <CardHeader><CardTitle className="text-base">Pedidos em aberto (2ª parte)</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {pedidosAbertos.map((o) => (
+              <div key={o.id} className="flex items-center justify-between border rounded-lg p-3">
+                <div className="text-sm">
+                  <span className="font-medium">
+                    {(o.items ?? []).map((it) => `${it.productName}`).join(", ") || "Pedido"}
+                  </span>
+                  <p className="text-xs text-muted-foreground">
+                    restante {o.remainingDue ? `· vence ${new Date(o.remainingDue + "T12:00:00").toLocaleDateString("pt-BR")}` : ""}
+                  </p>
+                </div>
+                <span className="font-bold text-amber-700">{fmtBRL(o.remaining)}</span>
+              </div>
+            ))}
+            <p className="text-xs text-muted-foreground">
+              Vá na aba <strong>Loja</strong> → "Meus pedidos" para pagar o restante.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -491,6 +520,7 @@ export default function StudentPortal() {
               <TabsTrigger value="perfil" className="flex-1 gap-1"><User className="h-4 w-4" /> Perfil</TabsTrigger>
               <TabsTrigger value="evolucao" className="flex-1 gap-1"><Award className="h-4 w-4" /> Evolução</TabsTrigger>
               <TabsTrigger value="aulas" className="flex-1 gap-1"><Dumbbell className="h-4 w-4" /> Aulas</TabsTrigger>
+              <TabsTrigger value="loja" className="flex-1 gap-1"><ShoppingBag className="h-4 w-4" /> Loja</TabsTrigger>
               <TabsTrigger value="mensalidades" className="flex-1 gap-1"><CreditCard className="h-4 w-4" /> Financeiro</TabsTrigger>
             </TabsList>
           </div>
@@ -503,6 +533,9 @@ export default function StudentPortal() {
           </TabsContent>
           <TabsContent value="aulas" className="mt-6">
             <AulasTab studentId={student.id} />
+          </TabsContent>
+          <TabsContent value="loja" className="mt-6">
+            <StoreTab studentId={student.id} />
           </TabsContent>
           <TabsContent value="mensalidades" className="mt-6">
             <MensalidadesTab studentId={student.id} />
