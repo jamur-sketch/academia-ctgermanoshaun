@@ -148,13 +148,28 @@ function ProductsTab() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PForm>(emptyProduct);
+  const [sizesText, setSizesText] = useState("P, M, G, GG");
 
-  const openNew = () => { setEditingId(null); setForm(emptyProduct); setDialogOpen(true); };
-  const openEdit = (p: Product) => { setEditingId(p.id); const { id, ...rest } = p; void id; setForm(rest); setDialogOpen(true); };
+  const openNew = () => {
+    setEditingId(null);
+    setForm(emptyProduct);
+    setSizesText("P, M, G, GG");
+    setDialogOpen(true);
+  };
+  const openEdit = (p: Product) => {
+    setEditingId(p.id);
+    const { id, ...rest } = p;
+    void id;
+    setForm(rest);
+    setSizesText(p.sizes.join(", "));
+    setDialogOpen(true);
+  };
   const save = () => {
     if (!form.name.trim()) return;
-    if (editingId) updateProduct(editingId, form);
-    else addProduct(form);
+    const sizes = sizesText.split(",").map((s) => s.trim()).filter(Boolean);
+    const data = { ...form, sizes };
+    if (editingId) updateProduct(editingId, data);
+    else addProduct(data);
     setDialogOpen(false);
   };
 
@@ -240,8 +255,9 @@ function ProductsTab() {
             <div className="space-y-1.5">
               <Label>Tamanhos (separe por vírgula)</Label>
               <Input
-                value={form.sizes.join(", ")}
-                onChange={(e) => setForm({ ...form, sizes: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
+                value={sizesText}
+                onChange={(e) => setSizesText(e.target.value)}
+                placeholder="P, M, G, GG"
               />
             </div>
             <div className="space-y-1.5">
