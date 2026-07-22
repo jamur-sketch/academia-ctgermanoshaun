@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ShoppingBag, Copy, Check } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ShoppingBag, Copy, Check, Trash2, ShoppingCart } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Label } from "@/shared/ui/label";
 import { Input } from "@/shared/ui/input";
@@ -22,7 +22,7 @@ import {
 import { QRCodePix } from "@/shared/components/QRCodePix";
 import { pixForAmount } from "@/shared/lib/pix";
 import { Product, Order } from "@/shared/domain";
-import { usePortalStore } from "./usePortalStore";
+import { usePortalStore, CartLine } from "./usePortalStore";
 import { useAppSetting } from "@/modules/pedidos/useAppSettings";
 
 function brl(v: number) {
@@ -33,6 +33,7 @@ export default function StoreTab({ studentId }: { studentId: string }) {
   const { products, orders, loading, createOrder } = usePortalStore(studentId);
   const { value: pixKey } = useAppSetting("order_pix");
 
+  const [cart, setCart] = useState<CartLine[]>([]);
   const [pedir, setPedir] = useState<Product | null>(null);
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
@@ -41,24 +42,38 @@ export default function StoreTab({ studentId }: { studentId: string }) {
   const [pay, setPay] = useState<Order | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const sortedProducts = useMemo(
+    () => [...products].sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
+    [products]
+  );
+
+  const cartTotal = cart.reduce((s, l) => s + l.product.price * l.quantity, 0);
+
   const openPedir = (p: Product) => {
     setPedir(p);
     setSize(p.sizes[0] ?? "");
     setQty(1);
   };
 
-  const confirmPedido = async () => {
-    if (!pedir) return;
-    setSaving(true);
-    await createOrder([{ product: pedir, size, quantity: qty }]);
-    setSaving(false);
+  const addToCart = () => {
+    if (!pedir || !size) return;
+    setCart((prev) => [...prev, { product: pedir, size, quantity: qty }]);
     setPedir(null);
   };
 
-  // valor a pagar no dialog: entrada (50%) se ainda não pagou, senão o restante
+  const removeFromCart = (i: number) => setCart((prev) => prev.filter((_, idx) => idx !== i));
+
+  const finalizar = async () => {
+    if (cart.length === 0) return;
+    setSaving(true);
+    await createOrder(cart);
+    setSaving(false);
+    setCart([]);
+  };
+
   const payAmount = pay ? (!pay.depositPaid ? pay.deposit : pay.remaining) : 0;
   const payLabel = pay && !pay.depositPaid ? "entrada (50%)" : "restante (50%)";
-  const pixCode = pixForAmount(pixKey, payAmount); // código gerado com o valor exato
+  const pixCode = pixForAmount(pixKey, payAmount);
 
   const copyPix = async () => {
     try {
@@ -70,15 +85,14 @@ export default function StoreTab({ studentId }: { studentId: string }) {
 
   return (
     <div className="space-y-4">
-      {/* Aviso */}
       <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm text-amber-800 dark:text-amber-300">
-        O pedido só é confirmado após o pagamento de <strong>50% de entrada</strong>. O restante (50%)
-        vence em <strong>30 dias</strong>. Sem o pagamento da entrada, o pedido não é realizado.
+        Monte seu pedido adicionando os itens ao carrinho. O pedido só é confirmado após o pagamento
+        de <strong>50% de entrada</strong>; o restante (50%) vence em <strong>30 dias</strong>.
       </div>
 
-      {/* Catálogo */}
+      {/* Catálogo (ordem alfabética) */}
       <div className="grid sm:grid-cols-2 gap-3">
-        {products.map((p) => (
+        {sortedProducts.map((p) => (
           <Card key={p.id}>
             <CardContent className="pt-4 pb-4 space-y-2">
               {p.video && (
@@ -92,8 +106,8 @@ export default function StoreTab({ studentId }: { studentId: string }) {
                 <p className="font-bold">{brl(p.price)}</p>
               </div>
               {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
-              <Button className="w-full" onClick={() => openPedir(p)} disabled={p.price <= 0}>
-                {p.price > 0 ? "Pedir" : "Em breve"}
+              <Button className="w-full" variant="outline" onClick={() => openPedir(p)} disabled={p.price <= 0}>
+                {p.price > 0 ? "Adicionar" : "Em breve"}
               </Button>
             </CardContent>
           </Card>
@@ -104,6 +118,38 @@ export default function StoreTab({ studentId }: { studentId: string }) {
           </p>
         )}
       </div>
+
+      {/* Carrinho */}
+      {cart.length > 0 && (
+        <Card className="border-primary/40">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" /> Seu pedido
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {cart.map((l, i) => (
+              <div key={i} className="flex items-center justify-between gap-2 border rounded-lg p-2.5">
+                <div className="text-sm min-w-0">
+                  <span className="font-medium">{l.quantity}× {l.product.name} ({l.size})</span>
+                  <p className="text-xs text-muted-foreground">{brl(l.product.price * l.quantity)}</p>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+            <div className="text-sm rounded-lg bg-muted p-3 space-y-1">
+              <div className="flex justify-between"><span>Total</span><span className="font-medium">{brl(cartTotal)}</span></div>
+              <div className="flex justify-between text-amber-700"><span>Entrada agora (50%)</span><span className="font-medium">{brl(cartTotal / 2)}</span></div>
+              <div className="flex justify-between text-muted-foreground"><span>Restante (30 dias)</span><span>{brl(cartTotal / 2)}</span></div>
+            </div>
+            <Button className="w-full" onClick={finalizar} disabled={saving}>
+              {saving ? "Enviando..." : "Finalizar pedido"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Meus pedidos */}
       <Card>
@@ -147,10 +193,10 @@ export default function StoreTab({ studentId }: { studentId: string }) {
         </CardContent>
       </Card>
 
-      {/* Dialog: fazer pedido */}
+      {/* Dialog: adicionar item ao carrinho */}
       <Dialog open={!!pedir} onOpenChange={(o) => !o && setPedir(null)}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Pedir — {pedir?.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{pedir?.name}</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -167,19 +213,10 @@ export default function StoreTab({ studentId }: { studentId: string }) {
                 <Input type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value)))} />
               </div>
             </div>
-            {pedir && (
-              <div className="text-sm rounded-lg bg-muted p-3 space-y-1">
-                <div className="flex justify-between"><span>Total</span><span className="font-medium">{brl(pedir.price * qty)}</span></div>
-                <div className="flex justify-between text-amber-700"><span>Entrada agora (50%)</span><span className="font-medium">{brl((pedir.price * qty) / 2)}</span></div>
-                <div className="flex justify-between text-muted-foreground"><span>Restante (30 dias)</span><span>{brl((pedir.price * qty) / 2)}</span></div>
-              </div>
-            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setPedir(null)}>Cancelar</Button>
-            <Button onClick={confirmPedido} disabled={saving || !size}>
-              {saving ? "Enviando..." : "Confirmar pedido"}
-            </Button>
+            <Button onClick={addToCart} disabled={!size}>Adicionar ao pedido</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

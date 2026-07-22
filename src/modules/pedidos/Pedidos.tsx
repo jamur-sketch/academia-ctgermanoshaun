@@ -201,7 +201,7 @@ function ProductsTab() {
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3">
-        {products.map((p) => (
+        {[...products].sort((a, b) => a.name.localeCompare(b.name, "pt-BR")).map((p) => (
           <Card key={p.id}>
             <CardContent className="pt-5 pb-4 space-y-2">
               <div className="flex items-center justify-between">
