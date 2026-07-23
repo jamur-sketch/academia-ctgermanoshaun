@@ -15,9 +15,10 @@ import { usePlans } from "@/modules/planos/usePlans";
 import { Student } from "@/shared/domain";
 import { StudentTable } from "./components/StudentTable";
 import { StudentFormDialog } from "./components/StudentFormDialog";
+import { PortalRegistrations } from "./components/PortalRegistrations";
 
 export default function Alunos() {
-  const { students, addStudent, updateStudent, deleteStudent } = useStudents();
+  const { students, addStudent, updateStudent, deleteStudent, mergeStudents } = useStudents();
   const { plans } = usePlans();
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -71,6 +72,8 @@ export default function Alunos() {
           <Plus className="h-4 w-4" /> Novo aluno
         </Button>
       </div>
+
+      <PortalRegistrations students={students} onMerge={mergeStudents} />
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

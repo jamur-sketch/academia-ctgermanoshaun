@@ -1,5 +1,6 @@
 import { Student, uid } from "@/shared/domain";
 import { useSupabaseTable, dateOrNull } from "@/shared/hooks/useSupabaseTable";
+import { supabase } from "@/shared/lib/supabase";
 
 export function studentFromRow(r: Record<string, unknown>): Student {
   return {
@@ -63,7 +64,7 @@ export function studentToRow(s: Partial<Student>): Record<string, unknown> {
 }
 
 export function useStudents() {
-  const { items, loading, add, update, remove } = useSupabaseTable<Student>(
+  const { items, loading, add, update, remove, reload } = useSupabaseTable<Student>(
     "students",
     studentFromRow,
     studentToRow
@@ -73,5 +74,36 @@ export function useStudents() {
   const updateStudent = (id: string, data: Partial<Student>) => update(id, data);
   const deleteStudent = (id: string) => remove(id);
 
-  return { students: items, loading, addStudent, updateStudent, deleteStudent };
+  // Vincula um cadastro feito pelo portal (portal) a um aluno já existente
+  // (existingId, que tem o histórico). O login e os dados pessoais passam
+  // para o registro antigo, e o duplicado é removido.
+  const mergeStudents = async (existingId: string, portal: Student) => {
+    await supabase
+      .from("students")
+      .update({
+        name: portal.name,
+        email: portal.email || null,
+        phone: portal.phone || null,
+        birth_date: dateOrNull(portal.birthDate || ""),
+        cpf: portal.cpf || null,
+        address: portal.address || null,
+        address_number: portal.addressNumber || null,
+        neighborhood: portal.neighborhood || null,
+        instagram: portal.instagram || null,
+        facebook: portal.facebook || null,
+        target_weight: portal.targetWeight ?? null,
+        consent_data: portal.consentData ?? false,
+        consent_date: portal.consentDate || null,
+        auth_user_id: portal.authUserId || null,
+      })
+      .eq("id", existingId);
+    // move pesos e pedidos do registro novo para o antigo
+    await supabase.from("weight_entries").update({ student_id: existingId }).eq("student_id", portal.id);
+    await supabase.from("orders").update({ student_id: existingId }).eq("student_id", portal.id);
+    // remove o duplicado
+    await supabase.from("students").delete().eq("id", portal.id);
+    await reload();
+  };
+
+  return { students: items, loading, addStudent, updateStudent, deleteStudent, mergeStudents };
 }
