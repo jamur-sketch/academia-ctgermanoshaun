@@ -103,7 +103,18 @@ export function usePortalStore(studentId: string | undefined) {
     return orderId;
   };
 
-  return { products, orders, loading, createOrder, reload: load };
+  // O aluno pode remover um pedido enquanto ainda está "aguardando"
+  // (antes de a equipe confirmar o pagamento da entrada).
+  const cancelOrder = async (orderId: string) => {
+    setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    const { error } = await supabase.from("orders").delete().eq("id", orderId).eq("status", "aguardando");
+    if (error) {
+      console.error("[store] cancel order:", error.message);
+      load();
+    }
+  };
+
+  return { products, orders, loading, createOrder, cancelOrder, reload: load };
 }
 
 export type { CartLine };

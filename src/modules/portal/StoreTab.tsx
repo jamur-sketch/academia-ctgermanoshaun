@@ -30,7 +30,7 @@ function brl(v: number) {
 }
 
 export default function StoreTab({ studentId }: { studentId: string }) {
-  const { products, orders, loading, createOrder } = usePortalStore(studentId);
+  const { products, orders, loading, createOrder, cancelOrder } = usePortalStore(studentId);
   const { value: pixKey } = useAppSetting("order_pix");
 
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -179,7 +179,19 @@ export default function StoreTab({ studentId }: { studentId: string }) {
                 )}
               </div>
               {!o.depositPaid && (
-                <Button size="sm" className="w-full" onClick={() => setPay(o)}>Pagar entrada — {brl(o.deposit)}</Button>
+                <div className="flex gap-2">
+                  <Button size="sm" className="flex-1" onClick={() => setPay(o)}>Pagar entrada — {brl(o.deposit)}</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => {
+                      if (confirm("Deseja cancelar este pedido?")) cancelOrder(o.id);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               )}
               {o.depositPaid && !o.remainingPaid && (
                 <div className="flex items-center justify-between gap-2">
