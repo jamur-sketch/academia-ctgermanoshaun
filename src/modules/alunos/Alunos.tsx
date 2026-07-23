@@ -24,6 +24,7 @@ export default function Alunos() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Student | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   const planName = (ids: string[]) => {
     const names = ids.map((id) => plans.find((p) => p.id === id)?.name).filter(Boolean);
@@ -45,17 +46,23 @@ export default function Alunos() {
 
   const openNew = () => {
     setEditing(null);
+    setSaveError("");
     setDialogOpen(true);
   };
 
   const openEdit = (student: Student) => {
     setEditing(student);
+    setSaveError("");
     setDialogOpen(true);
   };
 
-  const handleSubmit = (data: Omit<Student, "id">) => {
-    if (editing) updateStudent(editing.id, data);
-    else addStudent(data);
+  const handleSubmit = async (data: Omit<Student, "id">) => {
+    const { error } = editing ? await updateStudent(editing.id, data) : await addStudent(data);
+    if (error) {
+      setSaveError(error);
+      return; // mantém o diálogo aberto para não perder a edição
+    }
+    setSaveError("");
     setDialogOpen(false);
   };
 
@@ -114,11 +121,15 @@ export default function Alunos() {
 
       <StudentFormDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          setSaveError("");
+          setDialogOpen(false);
+        }}
         editing={editing}
         plans={plans}
         students={students}
         onSubmit={handleSubmit}
+        externalError={saveError}
       />
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

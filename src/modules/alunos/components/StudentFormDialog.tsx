@@ -42,6 +42,7 @@ export function StudentFormDialog({
   plans,
   students,
   onSubmit,
+  externalError,
 }: {
   open: boolean;
   onClose: () => void;
@@ -49,6 +50,7 @@ export function StudentFormDialog({
   plans: Plan[];
   students: Student[];
   onSubmit: (data: FormState) => void;
+  externalError?: string;
 }) {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState("");
@@ -237,7 +239,9 @@ export function StudentFormDialog({
             </Select>
           </div>
         </div>
-        {formError && <p className="text-sm text-destructive">{formError}</p>}
+        {(formError || externalError) && (
+          <p className="text-sm text-destructive">{formError || externalError}</p>
+        )}
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Cancelar

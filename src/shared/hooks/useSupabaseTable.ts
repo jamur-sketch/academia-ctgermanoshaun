@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/shared/lib/supabase";
 
+/** Resultado de uma escrita: { error } preenchido quando algo falhou. */
+export type WriteResult = { error?: string };
+
+const PERMISSION_MSG =
+  "Não foi possível salvar (sem permissão). Saia e entre novamente na conta para renovar o acesso e tente de novo.";
+
 /**
  * Hook genérico para uma tabela do Supabase.
  * Mantém uma cópia local em estado (com update otimista) e recarrega
@@ -35,25 +41,44 @@ export function useSupabaseTable<T extends { id: string }>(
   }, [load]);
 
   const add = useCallback(
-    async (item: T) => {
+    async (item: T): Promise<WriteResult> => {
       setItems((prev) => [...prev, item]);
-      const { error } = await supabase.from(table).insert(toRow(item));
+      const { data, error } = await supabase.from(table).insert(toRow(item)).select();
       if (error) {
         console.error(`[${table}] insert:`, error.message);
         load();
+        return { error: error.message };
       }
+      if (!data || data.length === 0) {
+        console.error(`[${table}] insert afetou 0 linhas (RLS/permissão)`);
+        load();
+        return { error: PERMISSION_MSG };
+      }
+      return {};
     },
     [table, toRow, load]
   );
 
   const update = useCallback(
-    async (id: string, patch: Partial<T>) => {
+    async (id: string, patch: Partial<T>): Promise<WriteResult> => {
       setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
-      const { error } = await supabase.from(table).update(toRow(patch)).eq("id", id);
+      const { data, error } = await supabase
+        .from(table)
+        .update(toRow(patch))
+        .eq("id", id)
+        .select();
       if (error) {
         console.error(`[${table}] update:`, error.message);
         load();
+        return { error: error.message };
       }
+      // Sem erro mas 0 linhas = RLS bloqueou (ex.: sessão sem papel de equipe).
+      if (!data || data.length === 0) {
+        console.error(`[${table}] update afetou 0 linhas (RLS/permissão)`);
+        load();
+        return { error: PERMISSION_MSG };
+      }
+      return {};
     },
     [table, toRow, load]
   );
