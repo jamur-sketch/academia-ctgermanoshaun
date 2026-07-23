@@ -6,26 +6,43 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+// CORS configurável. Por padrão libera qualquer origem ("*", comportamento
+// atual). Para restringir, defina a variável de ambiente ALLOWED_ORIGINS na
+// função (lista separada por vírgula, ex.:
+// "https://academia-ctgermanoshaun.vercel.app,http://localhost:5173").
+// Só as origens da lista recebem o cabeçalho de permissão.
+function corsHeaders(req: Request): Record<string, string> {
+  const base: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    Vary: "Origin",
+  };
+  const allowed = (Deno.env.get("ALLOWED_ORIGINS") ?? "*").trim();
+  if (allowed === "*" || allowed === "") {
+    base["Access-Control-Allow-Origin"] = "*";
+    return base;
+  }
+  const list = allowed.split(",").map((o) => o.trim()).filter(Boolean);
+  const origin = req.headers.get("Origin") ?? "";
+  if (origin && list.includes(origin)) {
+    base["Access-Control-Allow-Origin"] = origin;
+  }
+  return base;
+}
 
-function json(body: unknown, status = 200) {
+function json(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...cors, "Content-Type": "application/json" },
+    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
   });
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return json({ ok: false, error: "Não autorizado." }, 401);
+    if (!authHeader) return json(req, { ok: false, error: "Não autorizado." }, 401);
 
     const url = Deno.env.get("SUPABASE_URL")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -40,7 +57,7 @@ Deno.serve(async (req) => {
       error: userErr,
     } = await caller.auth.getUser();
     if (userErr || !user) {
-      return json({ ok: false, error: "Sessão inválida. Faça login novamente." }, 401);
+      return json(req, { ok: false, error: "Sessão inválida. Faça login novamente." }, 401);
     }
 
     // IMPORTANTE: estar logado NÃO basta — alunos do portal também estão
@@ -49,7 +66,7 @@ Deno.serve(async (req) => {
     // contas de administrador.
     const callerRole = (user.app_metadata as { role?: string } | null)?.role;
     if (callerRole !== "equipe") {
-      return json({ ok: false, error: "Acesso restrito à equipe." }, 403);
+      return json(req, { ok: false, error: "Acesso restrito à equipe." }, 403);
     }
 
     const body = await req.json().catch(() => ({}));
@@ -59,7 +76,7 @@ Deno.serve(async (req) => {
     // ---------- LISTAR ----------
     if (action === "list") {
       const { data, error } = await admin.auth.admin.listUsers({ perPage: 1000 });
-      if (error) return json({ ok: false, error: error.message }, 400);
+      if (error) return json(req, { ok: false, error: error.message }, 400);
       const users = data.users.map((u) => ({
         id: u.id,
         email: u.email ?? "",
@@ -70,17 +87,17 @@ Deno.serve(async (req) => {
       }));
       // mais recentes primeiro
       users.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-      return json({ ok: true, users });
+      return json(req, { ok: true, users });
     }
 
     // ---------- CRIAR ----------
     if (action === "create") {
       const { email, password } = body;
       if (!email || !password) {
-        return json({ ok: false, error: "Informe e-mail e senha temporária." }, 400);
+        return json(req, { ok: false, error: "Informe e-mail e senha temporária." }, 400);
       }
       if (String(password).length < 6) {
-        return json({ ok: false, error: "A senha temporária deve ter ao menos 6 caracteres." }, 400);
+        return json(req, { ok: false, error: "A senha temporária deve ter ao menos 6 caracteres." }, 400);
       }
       const { error } = await admin.auth.admin.createUser({
         email: String(email).trim(),
@@ -95,25 +112,25 @@ Deno.serve(async (req) => {
         const msg = error.message.includes("already been registered")
           ? "Já existe um usuário com esse e-mail."
           : error.message;
-        return json({ ok: false, error: msg }, 400);
+        return json(req, { ok: false, error: msg }, 400);
       }
-      return json({ ok: true });
+      return json(req, { ok: true });
     }
 
     // ---------- EXCLUIR ----------
     if (action === "delete") {
       const { userId } = body;
-      if (!userId) return json({ ok: false, error: "Usuário não informado." }, 400);
+      if (!userId) return json(req, { ok: false, error: "Usuário não informado." }, 400);
       if (userId === user.id) {
-        return json({ ok: false, error: "Você não pode excluir a própria conta." }, 400);
+        return json(req, { ok: false, error: "Você não pode excluir a própria conta." }, 400);
       }
       const { error } = await admin.auth.admin.deleteUser(String(userId));
-      if (error) return json({ ok: false, error: error.message }, 400);
-      return json({ ok: true });
+      if (error) return json(req, { ok: false, error: error.message }, 400);
+      return json(req, { ok: true });
     }
 
-    return json({ ok: false, error: "Ação inválida." }, 400);
+    return json(req, { ok: false, error: "Ação inválida." }, 400);
   } catch (e) {
-    return json({ ok: false, error: String(e) });
+    return json(req, { ok: false, error: String(e) });
   }
 });

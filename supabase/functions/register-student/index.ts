@@ -7,16 +7,32 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+// CORS configurável. Por padrão libera qualquer origem ("*"). Para restringir,
+// defina a variável de ambiente ALLOWED_ORIGINS na função (lista separada por
+// vírgula, ex.: "https://academia-ctgermanoshaun.vercel.app,http://localhost:5173").
+function corsHeaders(req: Request): Record<string, string> {
+  const base: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    Vary: "Origin",
+  };
+  const allowed = (Deno.env.get("ALLOWED_ORIGINS") ?? "*").trim();
+  if (allowed === "*" || allowed === "") {
+    base["Access-Control-Allow-Origin"] = "*";
+    return base;
+  }
+  const list = allowed.split(",").map((o) => o.trim()).filter(Boolean);
+  const origin = req.headers.get("Origin") ?? "";
+  if (origin && list.includes(origin)) {
+    base["Access-Control-Allow-Origin"] = origin;
+  }
+  return base;
+}
 
-function json(body: unknown, status = 200) {
+function json(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...cors, "Content-Type": "application/json" },
+    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
   });
 }
 
@@ -25,7 +41,7 @@ function uid() {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
 
   try {
     const url = Deno.env.get("SUPABASE_URL")!;
@@ -38,13 +54,13 @@ Deno.serve(async (req) => {
     const name = String(b.name ?? "").trim();
 
     if (!email || !password || !name) {
-      return json({ ok: false, error: "Preencha nome, e-mail e senha." }, 400);
+      return json(req, { ok: false, error: "Preencha nome, e-mail e senha." }, 400);
     }
     if (password.length < 6) {
-      return json({ ok: false, error: "A senha deve ter ao menos 6 caracteres." }, 400);
+      return json(req, { ok: false, error: "A senha deve ter ao menos 6 caracteres." }, 400);
     }
     if (!b.consent) {
-      return json({ ok: false, error: "É necessário autorizar o uso dos dados." }, 400);
+      return json(req, { ok: false, error: "É necessário autorizar o uso dos dados." }, 400);
     }
 
     // 1) cria o usuário de auth com papel "aluno" (app_metadata = servidor)
@@ -59,7 +75,7 @@ Deno.serve(async (req) => {
       const msg = createErr?.message.includes("already been registered")
         ? "Já existe uma conta com esse e-mail."
         : createErr?.message ?? "Erro ao criar a conta.";
-      return json({ ok: false, error: msg }, 400);
+      return json(req, { ok: false, error: msg }, 400);
     }
 
     // 2) cria o registro do aluno vinculado
@@ -90,7 +106,7 @@ Deno.serve(async (req) => {
     if (insErr) {
       // desfaz o usuário criado se o registro falhar
       await admin.auth.admin.deleteUser(created.user.id);
-      return json({ ok: false, error: insErr.message }, 400);
+      return json(req, { ok: false, error: insErr.message }, 400);
     }
 
     // 3) peso inicial (opcional)
@@ -103,8 +119,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    return json({ ok: true });
+    return json(req, { ok: true });
   } catch (e) {
-    return json({ ok: false, error: String(e) }, 500);
+    return json(req, { ok: false, error: String(e) }, 500);
   }
 });
