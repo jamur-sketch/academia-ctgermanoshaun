@@ -91,41 +91,12 @@ export default function StoreTab({ studentId }: { studentId: string }) {
         de <strong>50% de entrada</strong>; o restante (50%) vence em <strong>30 dias</strong>.
       </div>
 
-      {/* Catálogo (ordem alfabética) */}
-      <div className="grid sm:grid-cols-2 gap-3">
-        {sortedProducts.map((p) => (
-          <Card key={p.id}>
-            <CardContent className="pt-4 pb-4 space-y-2">
-              {p.video && (
-                <video src={p.video} controls playsInline className="w-full rounded-lg bg-black max-h-64" />
-              )}
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{p.category}</p>
-                </div>
-                <p className="font-bold">{brl(p.price)}</p>
-              </div>
-              {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
-              <Button className="w-full" variant="outline" onClick={() => openPedir(p)} disabled={p.price <= 0}>
-                {p.price > 0 ? "Adicionar" : "Em breve"}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-        {!loading && products.length === 0 && (
-          <p className="text-sm text-muted-foreground col-span-full text-center py-8">
-            Nenhum produto disponível no momento.
-          </p>
-        )}
-      </div>
-
-      {/* Carrinho */}
+      {/* Carrinho (aparece no topo assim que você adiciona um item) */}
       {cart.length > 0 && (
         <Card className="border-primary/40">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" /> Seu pedido
+              <ShoppingCart className="h-4 w-4" /> Seu pedido ({cart.length} {cart.length === 1 ? "item" : "itens"})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -146,11 +117,40 @@ export default function StoreTab({ studentId }: { studentId: string }) {
               <div className="flex justify-between text-muted-foreground"><span>Restante (30 dias)</span><span>{brl(cartTotal / 2)}</span></div>
             </div>
             <Button className="w-full" onClick={finalizar} disabled={saving}>
-              {saving ? "Enviando..." : "Finalizar pedido"}
+              {saving ? "Enviando..." : "Finalizar pedido (1 pagamento)"}
             </Button>
           </CardContent>
         </Card>
       )}
+
+      {/* Catálogo (ordem alfabética) */}
+      <div className="grid sm:grid-cols-2 gap-3">
+        {sortedProducts.map((p) => (
+          <Card key={p.id}>
+            <CardContent className="pt-4 pb-4 space-y-2">
+              {p.video && (
+                <video src={p.video} controls playsInline className="w-full rounded-lg bg-black max-h-64" />
+              )}
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold">{p.name}</p>
+                  <p className="text-xs text-muted-foreground">{p.category}</p>
+                </div>
+                <p className="font-bold">{brl(p.price)}</p>
+              </div>
+              {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
+              <Button className="w-full" variant="outline" onClick={() => openPedir(p)} disabled={p.price <= 0}>
+                {p.price > 0 ? "Adicionar ao pedido" : "Em breve"}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+        {!loading && products.length === 0 && (
+          <p className="text-sm text-muted-foreground col-span-full text-center py-8">
+            Nenhum produto disponível no momento.
+          </p>
+        )}
+      </div>
 
       {/* Meus pedidos */}
       <Card>
