@@ -75,25 +75,29 @@ export function useStudents() {
   const deleteStudent = (id: string) => remove(id);
 
   // Vincula um cadastro feito pelo portal (portal) a um aluno já existente
-  // (existingId, que tem o histórico). O login e os dados pessoais passam
-  // para o registro antigo, e o duplicado é removido.
+  // (existingId, que tem o histórico). O login e os dados que o aluno
+  // preencheu passam para o registro antigo; o que ele deixou em branco
+  // mantém o valor antigo. Plano, status, data de entrada, mensalidades e
+  // graduações do registro antigo são preservados. O duplicado é removido.
   const mergeStudents = async (existingId: string, portal: Student) => {
+    const existing = items.find((s) => s.id === existingId);
+    const pick = (a?: string, b?: string) => (a && a.trim() ? a : b) || null;
     await supabase
       .from("students")
       .update({
-        name: portal.name,
-        email: portal.email || null,
-        phone: portal.phone || null,
-        birth_date: dateOrNull(portal.birthDate || ""),
-        cpf: portal.cpf || null,
-        address: portal.address || null,
-        address_number: portal.addressNumber || null,
-        neighborhood: portal.neighborhood || null,
-        instagram: portal.instagram || null,
-        facebook: portal.facebook || null,
-        target_weight: portal.targetWeight ?? null,
-        consent_data: portal.consentData ?? false,
-        consent_date: portal.consentDate || null,
+        name: pick(portal.name, existing?.name),
+        email: pick(portal.email, existing?.email),
+        phone: pick(portal.phone, existing?.phone),
+        birth_date: dateOrNull(portal.birthDate || existing?.birthDate || ""),
+        cpf: pick(portal.cpf, existing?.cpf),
+        address: pick(portal.address, existing?.address),
+        address_number: pick(portal.addressNumber, existing?.addressNumber),
+        neighborhood: pick(portal.neighborhood, existing?.neighborhood),
+        instagram: pick(portal.instagram, existing?.instagram),
+        facebook: pick(portal.facebook, existing?.facebook),
+        target_weight: portal.targetWeight ?? existing?.targetWeight ?? null,
+        consent_data: portal.consentData ?? existing?.consentData ?? false,
+        consent_date: portal.consentDate || existing?.consentDate || null,
         auth_user_id: portal.authUserId || null,
       })
       .eq("id", existingId);
