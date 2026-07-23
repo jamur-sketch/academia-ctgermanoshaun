@@ -43,6 +43,15 @@ Deno.serve(async (req) => {
       return json({ ok: false, error: "Sessão inválida. Faça login novamente." }, 401);
     }
 
+    // IMPORTANTE: estar logado NÃO basta — alunos do portal também estão
+    // logados. Só a equipe (app_metadata.role = "equipe") pode gerenciar
+    // usuários. Sem esta checagem, um aluno conseguiria listar/criar/excluir
+    // contas de administrador.
+    const callerRole = (user.app_metadata as { role?: string } | null)?.role;
+    if (callerRole !== "equipe") {
+      return json({ ok: false, error: "Acesso restrito à equipe." }, 403);
+    }
+
     const body = await req.json().catch(() => ({}));
     const action = body.action as string;
     const admin = createClient(url, serviceKey);
@@ -77,6 +86,9 @@ Deno.serve(async (req) => {
         email: String(email).trim(),
         password: String(password),
         email_confirm: true,
+        // Papel definido pelo SERVIDOR (nunca pelo cliente): novo usuário é
+        // equipe, então consegue gerenciar o sistema após o 1º acesso.
+        app_metadata: { role: "equipe" },
         user_metadata: { must_change_password: true },
       });
       if (error) {
