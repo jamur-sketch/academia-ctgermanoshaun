@@ -61,6 +61,7 @@ export interface Student {
   consentData?: boolean;
   consentDate?: string;
   authUserId?: string;
+  portalReviewed?: boolean;
 }
 
 export interface WeightEntry {

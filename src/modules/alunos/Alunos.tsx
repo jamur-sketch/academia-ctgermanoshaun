@@ -77,7 +77,11 @@ export default function Alunos() {
         </Button>
       </div>
 
-      <PortalRegistrations students={students} onMerge={mergeStudents} />
+      <PortalRegistrations
+        students={students}
+        onMerge={mergeStudents}
+        onMarkNew={(id) => updateStudent(id, { portalReviewed: true })}
+      />
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -32,6 +32,7 @@ export function studentFromRow(r: Record<string, unknown>): Student {
     consentData: Boolean(r.consent_data),
     consentDate: (r.consent_date as string) ?? "",
     authUserId: (r.auth_user_id as string) ?? "",
+    portalReviewed: Boolean(r.portal_reviewed),
   };
 }
 
@@ -60,6 +61,7 @@ export function studentToRow(s: Partial<Student>): Record<string, unknown> {
   if (s.instagram !== undefined) r.instagram = s.instagram || null;
   if (s.facebook !== undefined) r.facebook = s.facebook || null;
   if (s.targetWeight !== undefined) r.target_weight = s.targetWeight ?? null;
+  if (s.portalReviewed !== undefined) r.portal_reviewed = s.portalReviewed;
   return r;
 }
 
@@ -99,6 +101,7 @@ export function useStudents() {
         consent_data: portal.consentData ?? existing?.consentData ?? false,
         consent_date: portal.consentDate || existing?.consentDate || null,
         auth_user_id: portal.authUserId || null,
+        portal_reviewed: true,
       })
       .eq("id", existingId);
     // move pesos e pedidos do registro novo para o antigo

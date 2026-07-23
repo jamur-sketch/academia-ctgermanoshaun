@@ -14,19 +14,20 @@ import { Student } from "@/shared/domain";
 export function PortalRegistrations({
   students,
   onMerge,
+  onMarkNew,
 }: {
   students: Student[];
   onMerge: (existingId: string, portal: Student) => void;
+  onMarkNew: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [dismissed, setDismissed] = useState<string[]>([]);
   const [linkTarget, setLinkTarget] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
 
-  // Cadastros feitos pelo portal = têm login (auth) vinculado.
+  // A revisar = tem login (auth) e ainda não foi revisado.
   const portalRegs = useMemo(
-    () => students.filter((s) => s.authUserId && !dismissed.includes(s.id)),
-    [students, dismissed]
+    () => students.filter((s) => s.authUserId && !s.portalReviewed),
+    [students]
   );
 
   // Candidatos a vincular: alunos SEM login (registros antigos importados).
@@ -65,7 +66,7 @@ export function PortalRegistrations({
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setDismissed((d) => [...d, s.id])}>
+                <Button variant="ghost" size="sm" onClick={() => onMarkNew(s.id)}>
                   É aluno novo
                 </Button>
                 <Button size="sm" className="gap-1" onClick={() => { setLinkTarget(s); setSearch(""); }}>
