@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown, Smartphone } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import {
   Table,
@@ -87,7 +87,14 @@ export function StudentTable({
         <TableBody>
           {sorted.map((s) => (
             <TableRow key={s.id}>
-              <TableCell className="font-medium">{s.name}</TableCell>
+              <TableCell className="font-medium">
+                <span className="inline-flex items-center gap-1.5">
+                  {s.name}
+                  {s.authUserId && (
+                    <Smartphone className="h-3.5 w-3.5 text-green-600" aria-label="Tem login no portal" />
+                  )}
+                </span>
+              </TableCell>
               <TableCell className="text-sm text-muted-foreground">
                 {s.phone}
                 {s.phone && s.email && <br />}

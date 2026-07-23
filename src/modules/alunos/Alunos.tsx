@@ -65,7 +65,11 @@ export default function Alunos() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Alunos</h1>
           <p className="text-sm text-muted-foreground">
-            {students.filter((s) => s.status === "ativo").length} alunos ativos
+            {students.filter((s) => s.status === "ativo").length} alunos ativos ·{" "}
+            <span className="text-green-600">
+              {students.filter((s) => s.status === "ativo" && s.authUserId).length} com login
+            </span>{" "}
+            no portal
           </p>
         </div>
         <Button onClick={openNew} className="gap-2">
