@@ -96,8 +96,8 @@ Deno.serve(async (req) => {
       if (!email || !password) {
         return json(req, { ok: false, error: "Informe e-mail e senha temporária." }, 400);
       }
-      if (String(password).length < 6) {
-        return json(req, { ok: false, error: "A senha temporária deve ter ao menos 6 caracteres." }, 400);
+      if (String(password).length < 8) {
+        return json(req, { ok: false, error: "A senha temporária deve ter ao menos 8 caracteres." }, 400);
       }
       const { error } = await admin.auth.admin.createUser({
         email: String(email).trim(),

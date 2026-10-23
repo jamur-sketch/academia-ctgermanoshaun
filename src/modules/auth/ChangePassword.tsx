@@ -15,8 +15,8 @@ export default function ChangePassword() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    if (password.length < 6) {
-      setError("A senha deve ter ao menos 6 caracteres.");
+    if (password.length < 8) {
+      setError("A senha deve ter ao menos 8 caracteres.");
       return;
     }
     if (password !== confirm) {

@@ -56,8 +56,8 @@ Deno.serve(async (req) => {
     if (!email || !password || !name) {
       return json(req, { ok: false, error: "Preencha nome, e-mail e senha." }, 400);
     }
-    if (password.length < 6) {
-      return json(req, { ok: false, error: "A senha deve ter ao menos 6 caracteres." }, 400);
+    if (password.length < 8) {
+      return json(req, { ok: false, error: "A senha deve ter ao menos 8 caracteres." }, 400);
     }
     if (!b.consent) {
       return json(req, { ok: false, error: "É necessário autorizar o uso dos dados." }, 400);

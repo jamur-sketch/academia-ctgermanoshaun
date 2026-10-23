@@ -16,8 +16,8 @@ export function AccountSettings() {
 
   const changePassword = async () => {
     setMsg(null);
-    if (password.length < 6) {
-      setMsg({ ok: false, text: "A senha deve ter ao menos 6 caracteres." });
+    if (password.length < 8) {
+      setMsg({ ok: false, text: "A senha deve ter ao menos 8 caracteres." });
       return;
     }
     if (password !== confirm) {
