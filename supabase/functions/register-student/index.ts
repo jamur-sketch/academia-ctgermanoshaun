@@ -78,6 +78,49 @@ Deno.serve(async (req) => {
       return json(req, { ok: false, error: msg }, 400);
     }
 
+    // 1.5) Mapeia as turmas marcadas -> planos e valor da mensalidade.
+    // Boxe/Muay Thai casam pelo nome da modalidade da turma; "Personal" usa o
+    // Personal Fight 1x (R$200) como padrão — a equipe ajusta conforme pagam.
+    const classIds: string[] = Array.isArray(b.signupClassIds)
+      ? b.signupClassIds.map((x: unknown) => String(x))
+      : [];
+    let planIds: string[] = [];
+    let monthlyFee: number | null = null;
+    if (classIds.length > 0) {
+      const { data: classes } = await admin
+        .from("classes")
+        .select("id, name, modality")
+        .in("id", classIds);
+      const { data: plans } = await admin.from("plans").select("id, name, price");
+      const planList = (plans ?? []) as Array<{ id: string; name: string; price: number }>;
+      const norm = (s: unknown) => String(s ?? "").toLowerCase().trim();
+      const pickPlan = (cls: { name?: unknown; modality?: unknown }) => {
+        const hay = `${norm(cls.name)} ${norm(cls.modality)}`;
+        if (hay.includes("personal")) {
+          return (
+            planList.find((p) => /personal/i.test(p.name) && /1x|1\b/.test(p.name)) ||
+            planList
+              .filter((p) => /personal/i.test(p.name))
+              .sort((a, b) => Number(a.price) - Number(b.price))[0] ||
+            null
+          );
+        }
+        return (
+          planList.find((p) => norm(p.name) === norm(cls.modality)) ||
+          planList.find((p) => norm(cls.modality) && norm(cls.modality).includes(norm(p.name))) ||
+          planList.find((p) => norm(p.name) && hay.includes(norm(p.name))) ||
+          null
+        );
+      };
+      const matched = ((classes ?? []) as Array<{ name?: unknown; modality?: unknown }>)
+        .map((c) => pickPlan(c))
+        .filter((p): p is { id: string; name: string; price: number } => !!p);
+      planIds = [...new Set(matched.map((p) => String(p.id)))];
+      if (matched.length > 0) {
+        monthlyFee = Math.max(...matched.map((p) => Number(p.price) || 0));
+      }
+    }
+
     // 2) cria o registro do aluno vinculado
     const today = new Date().toISOString().slice(0, 10);
     const studentId = `aluno-${uid()}`;
@@ -96,7 +139,7 @@ Deno.serve(async (req) => {
       facebook: b.facebook ?? "",
       target_weight: b.targetWeight ? Number(b.targetWeight) : null,
       signup_class: b.signupClass ?? "",
-      plan_ids: [],
+      plan_ids: planIds,
       join_date: today,
       last_activity_date: today,
       status: "ativo",
@@ -108,6 +151,14 @@ Deno.serve(async (req) => {
       // desfaz o usuário criado se o registro falhar
       await admin.auth.admin.deleteUser(created.user.id);
       return json(req, { ok: false, error: insErr.message }, 400);
+    }
+
+    // 2.5) define a mensalidade conforme o plano da turma (Personal = R$200).
+    // A equipe pode ajustar depois em Mensalidades.
+    if (monthlyFee != null) {
+      await admin
+        .from("payment_configs")
+        .upsert({ student_id: studentId, monthly_fee: monthlyFee }, { onConflict: "student_id" });
     }
 
     // 3) peso inicial (opcional)

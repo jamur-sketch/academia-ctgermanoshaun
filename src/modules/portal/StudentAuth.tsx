@@ -34,13 +34,14 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const set = (k: keyof typeof reg, v: string) => setReg((p) => ({ ...p, [k]: v }));
 
   // turmas para o aluno escolher (lista pública). Pode marcar mais de uma.
+  // Guardamos os IDs marcados; o servidor usa o ID para atribuir o plano/valor.
   // Se não carregar, o campo vira texto livre para não travar o cadastro.
   const [turmas, setTurmas] = useState<TurmaOption[]>([]);
-  const [selectedTurmas, setSelectedTurmas] = useState<string[]>([]);
+  const [selectedTurmaIds, setSelectedTurmaIds] = useState<string[]>([]);
   const [turmaTexto, setTurmaTexto] = useState(""); // fallback sem lista
-  const toggleTurma = (label: string) =>
-    setSelectedTurmas((prev) =>
-      prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]
+  const toggleTurma = (id: string) =>
+    setSelectedTurmaIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
     );
   useEffect(() => {
     let active = true;
@@ -75,8 +76,9 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    const chosen = turmas.filter((t) => selectedTurmaIds.includes(t.id));
     const signupClass =
-      turmas.length > 0 ? selectedTurmas.join(" | ") : turmaTexto.trim();
+      turmas.length > 0 ? chosen.map((t) => t.label).join(" | ") : turmaTexto.trim();
     if (!signupClass) {
       setError("Marque a(s) turma(s) em que você está matriculado.");
       return;
@@ -87,7 +89,7 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
     }
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("register-student", {
-      body: { ...reg, signupClass, consent },
+      body: { ...reg, signupClass, signupClassIds: selectedTurmaIds, consent },
     });
     if (error || !data?.ok) {
       setError(data?.error || error?.message || "Não foi possível concluir o cadastro.");
@@ -201,7 +203,7 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
                     </p>
                     <div className="space-y-1.5">
                       {turmas.map((t) => {
-                        const active = selectedTurmas.includes(t.label);
+                        const active = selectedTurmaIds.includes(t.id);
                         return (
                           <label
                             key={t.id}
@@ -212,7 +214,7 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
                             <input
                               type="checkbox"
                               checked={active}
-                              onChange={() => toggleTurma(t.label)}
+                              onChange={() => toggleTurma(t.id)}
                               className="h-4 w-4 shrink-0"
                             />
                             <span>{t.label}</span>
