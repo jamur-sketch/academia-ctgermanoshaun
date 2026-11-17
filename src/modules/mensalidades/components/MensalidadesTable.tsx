@@ -50,6 +50,8 @@ export function MensalidadesTable({
             const paid = payment?.paid ?? false;
             const paidDate = payment?.paidDate ?? null;
             const amountPaid = payment?.amountPaid ?? null;
+            // Isento = cobrança ativa no mês, mas valor zero.
+            const exempt = billable && currentFee <= 0;
 
             return (
               <TableRow key={student.id}>
@@ -62,6 +64,8 @@ export function MensalidadesTable({
                     <span className="font-medium">{fmtBRL(amountPaid)}</span>
                   ) : !billable ? (
                     <span className="text-muted-foreground">—</span>
+                  ) : exempt ? (
+                    <span className="text-muted-foreground">Isento</span>
                   ) : (
                     <span className={isCurrentMonth && late && config.monthlyFee === 100 ? "text-amber-600 font-medium" : ""}>
                       {fmtBRL(currentFee)}
@@ -79,6 +83,8 @@ export function MensalidadesTable({
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Pago</Badge>
                   ) : !billable ? (
                     <Badge variant="outline" className="text-muted-foreground">Não cobrado</Badge>
+                  ) : exempt ? (
+                    <Badge variant="outline" className="text-blue-600 border-blue-300">Isento</Badge>
                   ) : isCurrentMonth && late ? (
                     <Badge variant="destructive">Atrasado</Badge>
                   ) : (
@@ -109,7 +115,7 @@ export function MensalidadesTable({
                         <XCircle className="h-3.5 w-3.5" />
                         Desfazer
                       </Button>
-                    ) : billable ? (
+                    ) : billable && !exempt ? (
                       <Button
                         size="sm"
                         className="h-8 gap-1"

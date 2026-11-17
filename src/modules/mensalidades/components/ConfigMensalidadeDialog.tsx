@@ -47,10 +47,19 @@ export function ConfigMensalidadeDialog({
               type="number"
               step="0.01"
               value={form.monthlyFee}
+              disabled={form.monthlyFee <= 0}
               onChange={(e) => setForm({ ...form, monthlyFee: Number(e.target.value) })}
             />
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.monthlyFee <= 0}
+                onChange={(e) => setForm({ ...form, monthlyFee: e.target.checked ? 0 : 100 })}
+              />
+              Aluno isento (não paga mensalidade)
+            </label>
             <p className="text-xs text-muted-foreground">
-              Padrão R$100. Valores diferentes não sofrem o ajuste do dia 15.
+              Padrão R$100. Valores diferentes (ou isento) não sofrem o ajuste do dia 15.
             </p>
           </div>
           <div className="space-y-1.5">

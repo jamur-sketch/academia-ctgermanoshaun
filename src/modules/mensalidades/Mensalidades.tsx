@@ -97,7 +97,10 @@ export default function Mensalidades() {
   // KPIs — baseado apenas nos ativos
   const totalAlunos = ativos.length;
   const pagos = ativos.filter((r) => r.payment?.paid).length;
-  const pendentes = billable ? totalAlunos - pagos : 0;
+  // Isentos (valor 0) não entram em "pendentes".
+  const pendentes = billable
+    ? ativos.filter((r) => !r.payment?.paid && r.currentFee > 0).length
+    : 0;
   const valorRecebido = ativos.reduce(
     (s, r) => s + (r.payment?.paid && r.payment.amountPaid ? r.payment.amountPaid : 0),
     0
