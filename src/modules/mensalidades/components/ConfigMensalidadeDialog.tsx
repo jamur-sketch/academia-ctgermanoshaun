@@ -59,7 +59,7 @@ export function ConfigMensalidadeDialog({
               Aluno isento (não paga mensalidade)
             </label>
             <p className="text-xs text-muted-foreground">
-              Padrão R$100. Valores diferentes (ou isento) não sofrem o ajuste do dia 15.
+              Padrão R$100. Valores diferentes (ou isento) não sofrem o ajuste do dia 10.
             </p>
           </div>
           <div className="space-y-1.5">

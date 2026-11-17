@@ -59,7 +59,7 @@ export function PagamentoDialog({
               onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })}
             />
             {baseFee === 100 && isLate() && (
-              <p className="text-xs text-amber-600">Após o dia 15 — valor ajustado para R$125.</p>
+              <p className="text-xs text-amber-600">Após o dia 10 — valor ajustado para R$125.</p>
             )}
           </div>
           <div className="space-y-1.5">
