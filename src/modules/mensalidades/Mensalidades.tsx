@@ -11,6 +11,7 @@ import {
   usePaymentConfigs,
   effectiveFee,
   isLate,
+  isBillableMonth,
 } from "@/modules/mensalidades/useMonthlyPayments";
 import { MONTH_NAMES } from "@/shared/constants";
 import { PayForm, ConfigForm, fmtBRL } from "./types";
@@ -71,13 +72,16 @@ export default function Mensalidades() {
     return names.length > 0 ? names.join(", ") : "—";
   };
 
+  const billable = isBillableMonth(month, year);
+
   const makeRows = (list: typeof students) =>
     list
       .filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
       .map((s) => {
         const config = getConfig(s.id);
         const payment = getPayment(s.id, month, year);
-        const currentFee = effectiveFee(config.monthlyFee);
+        // Antes do início da cobrança (Dez/2026), ninguém deve nada.
+        const currentFee = billable ? effectiveFee(config.monthlyFee) : 0;
         return { student: s, config, payment, currentFee };
       });
 
@@ -93,7 +97,7 @@ export default function Mensalidades() {
   // KPIs — baseado apenas nos ativos
   const totalAlunos = ativos.length;
   const pagos = ativos.filter((r) => r.payment?.paid).length;
-  const pendentes = totalAlunos - pagos;
+  const pendentes = billable ? totalAlunos - pagos : 0;
   const valorRecebido = ativos.reduce(
     (s, r) => s + (r.payment?.paid && r.payment.amountPaid ? r.payment.amountPaid : 0),
     0
@@ -195,6 +199,13 @@ export default function Mensalidades() {
         className="max-w-sm"
       />
 
+      {!billable && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+          A cobrança de mensalidades começa em <strong>Dezembro/2026</strong>. Em meses anteriores
+          ninguém é cobrado — este mês fica zerado.
+        </div>
+      )}
+
       <PedidosAReceber />
 
       <MensalidadesTable
@@ -202,6 +213,7 @@ export default function Mensalidades() {
         modalityOf={modalityOf}
         isCurrentMonth={isCurrentMonth}
         late={late}
+        billable={billable}
         onEditConfig={openConfigDialog}
         onPay={openPayDialog}
         onUnmark={(studentId) => unmarkPaid(studentId, month, year)}

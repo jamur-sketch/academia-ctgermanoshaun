@@ -16,6 +16,7 @@ export function MensalidadesTable({
   modalityOf,
   isCurrentMonth,
   late,
+  billable = true,
   onEditConfig,
   onPay,
   onUnmark,
@@ -24,6 +25,7 @@ export function MensalidadesTable({
   modalityOf: (studentId: string, planIds: string[]) => string;
   isCurrentMonth: boolean;
   late: boolean;
+  billable?: boolean;
   onEditConfig: (studentId: string, name: string) => void;
   onPay: (studentId: string, name: string, baseFee: number) => void;
   onUnmark: (studentId: string) => void;
@@ -58,6 +60,8 @@ export function MensalidadesTable({
                 <TableCell className="text-right whitespace-nowrap">
                   {paid && amountPaid !== null ? (
                     <span className="font-medium">{fmtBRL(amountPaid)}</span>
+                  ) : !billable ? (
+                    <span className="text-muted-foreground">—</span>
                   ) : (
                     <span className={isCurrentMonth && late && config.monthlyFee === 100 ? "text-amber-600 font-medium" : ""}>
                       {fmtBRL(currentFee)}
@@ -73,6 +77,8 @@ export function MensalidadesTable({
                 <TableCell>
                   {paid ? (
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Pago</Badge>
+                  ) : !billable ? (
+                    <Badge variant="outline" className="text-muted-foreground">Não cobrado</Badge>
                   ) : isCurrentMonth && late ? (
                     <Badge variant="destructive">Atrasado</Badge>
                   ) : (
@@ -103,7 +109,7 @@ export function MensalidadesTable({
                         <XCircle className="h-3.5 w-3.5" />
                         Desfazer
                       </Button>
-                    ) : (
+                    ) : billable ? (
                       <Button
                         size="sm"
                         className="h-8 gap-1"
@@ -112,7 +118,7 @@ export function MensalidadesTable({
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Marcar pago
                       </Button>
-                    )}
+                    ) : null}
                   </div>
                 </TableCell>
               </TableRow>

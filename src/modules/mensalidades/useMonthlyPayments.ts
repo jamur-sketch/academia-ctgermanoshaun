@@ -23,6 +23,18 @@ const DEFAULT_FEE = 100;
 const LATE_FEE = 125;
 const LATE_DAY = 10;
 
+// A academia começou a usar o sistema em Nov/2026, mas a cobrança de
+// mensalidade só passa a valer em Dezembro/2026. Meses anteriores não
+// cobram ninguém. (month é 0-based: 11 = Dezembro.)
+export const BILLING_START = { month: 11, year: 2026 };
+
+export function isBillableMonth(month: number, year: number): boolean {
+  return (
+    year > BILLING_START.year ||
+    (year === BILLING_START.year && month >= BILLING_START.month)
+  );
+}
+
 export function isLate(date?: Date): boolean {
   const d = date ?? new Date();
   return d.getDate() > LATE_DAY;
