@@ -163,6 +163,14 @@ Deno.serve(async (req) => {
         .upsert({ student_id: studentId, monthly_fee: monthlyFee }, { onConflict: "student_id" });
     }
 
+    // 2.6) Matricula o aluno nas turmas marcadas (vincula turma <-> aluno),
+    // para aparecer nas Aulas e para a modalidade vir da turma.
+    if (classIds.length > 0) {
+      await admin
+        .from("class_students")
+        .insert(classIds.map((cid) => ({ class_id: cid, student_id: studentId })));
+    }
+
     // 3) peso inicial (opcional)
     if (b.currentWeight) {
       await admin.from("weight_entries").insert({
