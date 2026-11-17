@@ -50,7 +50,7 @@ export function ConfigMensalidadeDialog({
               onChange={(e) => setForm({ ...form, monthlyFee: Number(e.target.value) })}
             />
             <p className="text-xs text-muted-foreground">
-              Padrão R$100. Valores diferentes não sofrem o ajuste do dia 10.
+              Padrão R$100. Valores diferentes não sofrem o ajuste do dia 15.
             </p>
           </div>
           <div className="space-y-1.5">

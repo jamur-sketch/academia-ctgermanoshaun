@@ -21,7 +21,8 @@ export interface MonthlyPayment {
 
 const DEFAULT_FEE = 100;
 const LATE_FEE = 125;
-const LATE_DAY = 10;
+// Vencimento no dia 15: a partir do dia 16 o valor padrão passa a R$125.
+const LATE_DAY = 15;
 
 // A academia começou a usar o sistema em Nov/2026, mas a cobrança de
 // mensalidade só passa a valer em Dezembro/2026. Meses anteriores não

@@ -140,7 +140,7 @@ export default function Mensalidades() {
           <p className="text-sm text-muted-foreground">
             Controle de pagamentos mensais
             {isCurrentMonth && late && (
-              <span className="ml-2 text-amber-600 font-medium">· Após o dia 10 — valor padrão: R$125</span>
+              <span className="ml-2 text-amber-600 font-medium">· Após o dia 15 — valor padrão: R$125</span>
             )}
           </p>
         </div>
