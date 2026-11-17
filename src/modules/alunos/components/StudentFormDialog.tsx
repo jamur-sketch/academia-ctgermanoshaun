@@ -141,7 +141,7 @@ export function StudentFormDialog({
             <Label>Gênero</Label>
             <Select value={form.gender} onValueChange={(v: Gender) => setForm({ ...form, gender: v })}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(GENDER_LABEL).map(([value, label]) => (

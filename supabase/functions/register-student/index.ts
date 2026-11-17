@@ -130,7 +130,9 @@ Deno.serve(async (req) => {
       email,
       phone: b.phone ?? "",
       birth_date: b.birthDate || null,
-      gender: b.gender ?? "masculino",
+      // Sem campo de gênero no cadastro: fica vazio para a equipe preencher
+      // depois na gestão (não assume "masculino").
+      gender: b.gender || "",
       cpf: b.cpf ?? "",
       address: b.address ?? "",
       address_number: b.addressNumber ?? "",

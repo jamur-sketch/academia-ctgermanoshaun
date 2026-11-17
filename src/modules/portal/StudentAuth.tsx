@@ -2,6 +2,13 @@ import { useState, useEffect, FormEvent } from "react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/shared/ui/select";
 import { supabase } from "@/shared/lib/supabase";
 
 type TurmaOption = { id: string; label: string };
@@ -17,6 +24,7 @@ const emptyReg = {
   addressNumber: "",
   neighborhood: "",
   instagram: "",
+  gender: "",
 };
 
 export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
@@ -190,9 +198,22 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
                   <Input value={reg.addressNumber} onChange={(e) => set("addressNumber", e.target.value)} />
                 </div>
               </div>
-              <div className="col-span-2 space-y-1.5">
+              <div className="space-y-1.5">
                 <Label>Instagram</Label>
                 <Input value={reg.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Gênero</Label>
+                <Select value={reg.gender} onValueChange={(v) => set("gender", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="masculino">Masculino</SelectItem>
+                    <SelectItem value="feminino">Feminino</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="col-span-2 space-y-1.5">
                 <Label>Turma(s) em que está matriculado *</Label>
