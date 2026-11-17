@@ -15,9 +15,7 @@ const emptyReg = {
   addressNumber: "",
   neighborhood: "",
   instagram: "",
-  facebook: "",
-  currentWeight: "",
-  targetWeight: "",
+  signupClass: "",
 };
 
 export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
@@ -153,30 +151,25 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
                   <Input value={reg.addressNumber} onChange={(e) => set("addressNumber", e.target.value)} />
                 </div>
               </div>
-              <div className="space-y-1.5">
+              <div className="col-span-2 space-y-1.5">
                 <Label>Instagram</Label>
                 <Input value={reg.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@" />
               </div>
-              <div className="space-y-1.5">
-                <Label>Facebook</Label>
-                <Input value={reg.facebook} onChange={(e) => set("facebook", e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Peso atual (kg)</Label>
-                <Input type="number" step="0.1" value={reg.currentWeight}
-                  onChange={(e) => set("currentWeight", e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Peso pretendido (kg)</Label>
-                <Input type="number" step="0.1" value={reg.targetWeight}
-                  onChange={(e) => set("targetWeight", e.target.value)} />
+              <div className="col-span-2 space-y-1.5">
+                <Label>Turma em que está matriculado *</Label>
+                <Input
+                  value={reg.signupClass}
+                  onChange={(e) => set("signupClass", e.target.value)}
+                  placeholder="Ex: Muay Thai - seg/qua 19h"
+                  required
+                />
               </div>
               <div className="col-span-2 border-t pt-3 space-y-1.5">
                 <Label>E-mail *</Label>
                 <Input type="email" value={reg.email} onChange={(e) => set("email", e.target.value)} required />
               </div>
               <div className="col-span-2 space-y-1.5">
-                <Label>Senha * (mín. 6)</Label>
+                <Label>Senha * (mín. 8)</Label>
                 <Input type="password" value={reg.password} onChange={(e) => set("password", e.target.value)} required />
               </div>
             </div>

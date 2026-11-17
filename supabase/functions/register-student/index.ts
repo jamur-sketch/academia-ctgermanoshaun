@@ -95,6 +95,7 @@ Deno.serve(async (req) => {
       instagram: b.instagram ?? "",
       facebook: b.facebook ?? "",
       target_weight: b.targetWeight ? Number(b.targetWeight) : null,
+      signup_class: b.signupClass ?? "",
       plan_ids: [],
       join_date: today,
       last_activity_date: today,

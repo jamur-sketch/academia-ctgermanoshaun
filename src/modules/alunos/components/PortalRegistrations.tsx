@@ -64,6 +64,11 @@ export function PortalRegistrations({
                 <p className="text-xs text-muted-foreground">
                   {s.email || "sem e-mail"}{s.cpf ? ` · CPF ${s.cpf}` : ""}
                 </p>
+                {s.signupClass ? (
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                    Turma informada: {s.signupClass}
+                  </p>
+                ) : null}
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={() => onMarkNew(s.id)}>

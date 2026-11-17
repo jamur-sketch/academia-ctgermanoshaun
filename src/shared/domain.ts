@@ -62,6 +62,9 @@ export interface Student {
   consentDate?: string;
   authUserId?: string;
   portalReviewed?: boolean;
+  // Turma que o aluno informou ao se cadastrar pelo portal (para a equipe
+  // revisar e matricular na turma certa).
+  signupClass?: string;
 }
 
 export interface WeightEntry {

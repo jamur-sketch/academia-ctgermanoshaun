@@ -33,6 +33,7 @@ export function studentFromRow(r: Record<string, unknown>): Student {
     consentDate: (r.consent_date as string) ?? "",
     authUserId: (r.auth_user_id as string) ?? "",
     portalReviewed: Boolean(r.portal_reviewed),
+    signupClass: (r.signup_class as string) ?? "",
   };
 }
 
@@ -62,6 +63,7 @@ export function studentToRow(s: Partial<Student>): Record<string, unknown> {
   if (s.facebook !== undefined) r.facebook = s.facebook || null;
   if (s.targetWeight !== undefined) r.target_weight = s.targetWeight ?? null;
   if (s.portalReviewed !== undefined) r.portal_reviewed = s.portalReviewed;
+  if (s.signupClass !== undefined) r.signup_class = s.signupClass || null;
   return r;
 }
 
