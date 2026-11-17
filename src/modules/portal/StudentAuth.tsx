@@ -1,8 +1,17 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/shared/ui/select";
 import { supabase } from "@/shared/lib/supabase";
+
+type TurmaOption = { id: string; label: string };
 
 const emptyReg = {
   name: "",
@@ -32,6 +41,30 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const [consent, setConsent] = useState(false);
   const set = (k: keyof typeof reg, v: string) => setReg((p) => ({ ...p, [k]: v }));
 
+  // turmas para o aluno escolher (lista pública). Se não carregar, o campo
+  // vira texto livre para não travar o cadastro.
+  const [turmas, setTurmas] = useState<TurmaOption[]>([]);
+  useEffect(() => {
+    let active = true;
+    supabase
+      .from("classes")
+      .select("id, name, schedule, type")
+      .then(({ data }) => {
+        if (!active || !data) return;
+        const opts = (data as Array<Record<string, unknown>>)
+          .filter((c) => (c.type as string) === "turma")
+          .map((c) => ({
+            id: c.id as string,
+            label: [c.name as string, c.schedule as string].filter(Boolean).join(" · "),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+        setTurmas(opts);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -44,6 +77,10 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!reg.signupClass.trim()) {
+      setError("Informe a turma em que você está matriculado.");
+      return;
+    }
     if (!consent) {
       setError("Você precisa autorizar o uso dos seus dados para se cadastrar.");
       return;
@@ -157,12 +194,30 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
               </div>
               <div className="col-span-2 space-y-1.5">
                 <Label>Turma em que está matriculado *</Label>
-                <Input
-                  value={reg.signupClass}
-                  onChange={(e) => set("signupClass", e.target.value)}
-                  placeholder="Ex: Muay Thai - seg/qua 19h"
-                  required
-                />
+                {turmas.length > 0 ? (
+                  <Select
+                    value={reg.signupClass}
+                    onValueChange={(v) => set("signupClass", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione sua turma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {turmas.map((t) => (
+                        <SelectItem key={t.id} value={t.label}>
+                          {t.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={reg.signupClass}
+                    onChange={(e) => set("signupClass", e.target.value)}
+                    placeholder="Ex: Muay Thai - seg/qua 19h"
+                    required
+                  />
+                )}
               </div>
               <div className="col-span-2 border-t pt-3 space-y-1.5">
                 <Label>E-mail *</Label>
