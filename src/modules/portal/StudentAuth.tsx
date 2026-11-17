@@ -2,13 +2,6 @@ import { useState, useEffect, FormEvent } from "react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/shared/ui/select";
 import { supabase } from "@/shared/lib/supabase";
 
 type TurmaOption = { id: string; label: string };
@@ -24,7 +17,6 @@ const emptyReg = {
   addressNumber: "",
   neighborhood: "",
   instagram: "",
-  signupClass: "",
 };
 
 export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
@@ -41,9 +33,15 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const [consent, setConsent] = useState(false);
   const set = (k: keyof typeof reg, v: string) => setReg((p) => ({ ...p, [k]: v }));
 
-  // turmas para o aluno escolher (lista pública). Se não carregar, o campo
-  // vira texto livre para não travar o cadastro.
+  // turmas para o aluno escolher (lista pública). Pode marcar mais de uma.
+  // Se não carregar, o campo vira texto livre para não travar o cadastro.
   const [turmas, setTurmas] = useState<TurmaOption[]>([]);
+  const [selectedTurmas, setSelectedTurmas] = useState<string[]>([]);
+  const [turmaTexto, setTurmaTexto] = useState(""); // fallback sem lista
+  const toggleTurma = (label: string) =>
+    setSelectedTurmas((prev) =>
+      prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]
+    );
   useEffect(() => {
     let active = true;
     supabase
@@ -77,8 +75,10 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!reg.signupClass.trim()) {
-      setError("Informe a turma em que você está matriculado.");
+    const signupClass =
+      turmas.length > 0 ? selectedTurmas.join(" | ") : turmaTexto.trim();
+    if (!signupClass) {
+      setError("Marque a(s) turma(s) em que você está matriculado.");
       return;
     }
     if (!consent) {
@@ -87,7 +87,7 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
     }
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("register-student", {
-      body: { ...reg, consent },
+      body: { ...reg, signupClass, consent },
     });
     if (error || !data?.ok) {
       setError(data?.error || error?.message || "Não foi possível concluir o cadastro.");
@@ -193,29 +193,39 @@ export default function StudentAuth({ onStaff }: { onStaff: () => void }) {
                 <Input value={reg.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@" />
               </div>
               <div className="col-span-2 space-y-1.5">
-                <Label>Turma em que está matriculado *</Label>
+                <Label>Turma(s) em que está matriculado *</Label>
                 {turmas.length > 0 ? (
-                  <Select
-                    value={reg.signupClass}
-                    onValueChange={(v) => set("signupClass", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione sua turma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {turmas.map((t) => (
-                        <SelectItem key={t.id} value={t.label}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <>
+                    <p className="text-xs text-muted-foreground">
+                      Marque todas as turmas em que você treina.
+                    </p>
+                    <div className="space-y-1.5">
+                      {turmas.map((t) => {
+                        const active = selectedTurmas.includes(t.label);
+                        return (
+                          <label
+                            key={t.id}
+                            className={`flex items-center gap-2.5 rounded-lg border p-2.5 text-sm cursor-pointer transition-colors ${
+                              active ? "border-primary bg-primary/5" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={active}
+                              onChange={() => toggleTurma(t.label)}
+                              className="h-4 w-4 shrink-0"
+                            />
+                            <span>{t.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </>
                 ) : (
                   <Input
-                    value={reg.signupClass}
-                    onChange={(e) => set("signupClass", e.target.value)}
+                    value={turmaTexto}
+                    onChange={(e) => setTurmaTexto(e.target.value)}
                     placeholder="Ex: Muay Thai - seg/qua 19h"
-                    required
                   />
                 )}
               </div>
