@@ -115,9 +115,13 @@ Deno.serve(async (req) => {
       const matched = ((classes ?? []) as Array<{ name?: unknown; modality?: unknown }>)
         .map((c) => pickPlan(c))
         .filter((p): p is { id: string; name: string; price: number } => !!p);
-      planIds = [...new Set(matched.map((p) => String(p.id)))];
-      if (matched.length > 0) {
-        monthlyFee = Math.max(...matched.map((p) => Number(p.price) || 0));
+      // Planos DISTINTOS (duas turmas da mesma modalidade contam uma vez só).
+      const uniquePlans = new Map<string, number>();
+      for (const p of matched) uniquePlans.set(String(p.id), Number(p.price) || 0);
+      planIds = [...uniquePlans.keys()];
+      if (uniquePlans.size > 0) {
+        // Mensalidade = soma dos planos (ex: Boxe R$100 + Muay Thai R$100 = R$200).
+        monthlyFee = [...uniquePlans.values()].reduce((s, v) => s + v, 0);
       }
     }
 
