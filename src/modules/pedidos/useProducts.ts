@@ -9,6 +9,7 @@ function fromRow(r: Record<string, unknown>): Product {
     price: r.price != null ? Number(r.price) : 0,
     description: (r.description as string) ?? "",
     video: (r.video as string) ?? "",
+    image: (r.image as string) ?? "",
     sizes: (r.sizes as string[]) ?? [],
     active: Boolean(r.active),
   };
@@ -22,6 +23,7 @@ function toRow(p: Partial<Product>): Record<string, unknown> {
   if (p.price !== undefined) r.price = p.price;
   if (p.description !== undefined) r.description = p.description;
   if (p.video !== undefined) r.video = p.video;
+  if (p.image !== undefined) r.image = p.image;
   if (p.sizes !== undefined) r.sizes = p.sizes;
   if (p.active !== undefined) r.active = p.active;
   return r;

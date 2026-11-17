@@ -16,6 +16,7 @@ function productFromRow(r: Record<string, unknown>): Product {
     price: Number(r.price ?? 0),
     description: (r.description as string) ?? "",
     video: (r.video as string) ?? "",
+    image: (r.image as string) ?? "",
     sizes: (r.sizes as string[]) ?? [],
     active: Boolean(r.active),
   };

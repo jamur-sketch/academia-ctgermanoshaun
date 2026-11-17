@@ -74,7 +74,14 @@ export interface WeightEntry {
   weight: number;
 }
 
-export const PRODUCT_CATEGORIES = ["Camiseta", "Short", "Top", "Conjunto"];
+export const PRODUCT_CATEGORIES = [
+  "Camiseta",
+  "Short",
+  "Top",
+  "Conjunto",
+  "Bandagem",
+  "Bucal",
+];
 
 export interface Product {
   id: string;
@@ -83,6 +90,7 @@ export interface Product {
   price: number;
   description: string;
   video: string;
+  image: string;
   sizes: string[];
   active: boolean;
 }

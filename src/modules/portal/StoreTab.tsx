@@ -131,6 +131,9 @@ export default function StoreTab({ studentId }: { studentId: string }) {
               {p.video && (
                 <video src={p.video} controls playsInline className="w-full rounded-lg bg-black max-h-64" />
               )}
+              {p.image && (
+                <img src={p.image} alt={p.name} className="w-full rounded-lg object-cover max-h-64" />
+              )}
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-semibold">{p.name}</p>

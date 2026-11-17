@@ -137,9 +137,37 @@ const emptyProduct: PForm = {
   price: 0,
   description: "",
   video: "",
+  image: "",
   sizes: ["P", "M", "G", "GG"],
   active: true,
 };
+
+// Lê a imagem escolhida e reduz o tamanho (máx. ~900px, JPEG) para não pesar
+// no banco — guardamos a foto como data URL direto no produto.
+async function fileToResizedDataUrl(file: File, max = 900, quality = 0.8): Promise<string> {
+  const original = await new Promise<string>((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result));
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const im = new Image();
+    im.onload = () => resolve(im);
+    im.onerror = reject;
+    im.src = original;
+  });
+  const scale = Math.min(1, max / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return original;
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL("image/jpeg", quality);
+}
 
 function ProductsTab() {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
@@ -211,6 +239,9 @@ function ProductsTab() {
                 </div>
                 {!p.active && <Badge variant="secondary">Inativo</Badge>}
               </div>
+              {p.image && (
+                <img src={p.image} alt={p.name} className="w-full h-32 rounded-md object-cover border" />
+              )}
               {p.video && <p className="text-xs text-muted-foreground">🎥 vídeo anexado</p>}
               <div className="flex gap-2 pt-1">
                 <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openEdit(p)}>
@@ -269,6 +300,29 @@ function ProductsTab() {
                   {PRODUCT_VIDEOS.map((v, i) => <SelectItem key={v} value={v}>Vídeo {i + 1}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Foto</Label>
+              {form.image ? (
+                <div className="flex items-center gap-3">
+                  <img src={form.image} alt="" className="h-16 w-16 rounded-md object-cover border" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => setForm({ ...form, image: "" })}>
+                    Remover foto
+                  </Button>
+                </div>
+              ) : (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    const url = await fileToResizedDataUrl(f);
+                    setForm((prev) => ({ ...prev, image: url }));
+                  }}
+                  className="block w-full text-sm file:mr-3 file:rounded-md file:border file:border-input file:bg-background file:px-3 file:py-1.5 file:text-sm file:cursor-pointer"
+                />
+              )}
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
